@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Anna & Charlie's Wedding — Omaha Guide</title>
+  <meta name="theme-color" content="#2b2420" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">Welcome to Omaha</p>
+    <h1 id="hero-title">Anna & Charlie's Wedding</h1>
+    <p class="hero-date" id="hero-date"></p>
+  </header>
+
+  <main id="views">
+    <section id="view-home" class="view">
+      <div class="card">
+        <h2 id="venue-name"></h2>
+        <p id="venue-address" class="muted"></p>
+        <a id="venue-maps-link" class="btn" href="#" target="_blank" rel="noopener">Get directions</a>
+        <dl class="detail-list">
+          <div><dt>Ceremony</dt><dd id="ceremony-time"></dd></div>
+          <div><dt>Reception</dt><dd id="reception-time"></dd></div>
+          <div id="dress-row"><dt>Dress code</dt><dd id="dress-code"></dd></div>
+          <div id="hotel-row"><dt>Where to stay</dt><dd id="hotel-block"></dd></div>
+        </dl>
+        <p id="wedding-notes" class="muted small"></p>
+      </div>
+      <p class="section-lede">Tap the tabs below to browse things to eat, drink, and do while you're in town. Save your favorites — they stay on this phone.</p>
+    </section>
+
+    <section id="view-guide" class="view" hidden>
+      <div class="filters" role="tablist" aria-label="Category">
+        <button class="chip is-active" data-filter="all">All</button>
+        <button class="chip" data-filter="eat">Eat</button>
+        <button class="chip" data-filter="drink">Drink</button>
+        <button class="chip" data-filter="do">Do</button>
+        <button class="chip" data-filter="stay">Stay</button>
+      </div>
+      <ul id="place-list" class="place-list"></ul>
+    </section>
+
+    <section id="view-saved" class="view" hidden>
+      <p class="section-lede">Your saved spots. Stored privately on this device only.</p>
+      <ul id="saved-list" class="place-list"></ul>
+      <p id="saved-empty" class="muted" hidden>Nothing saved yet — heart something from the Guide tab.</p>
+    </section>
+
+    <section id="view-contact" class="view" hidden>
+      <div class="card">
+        <h2>Questions?</h2>
+        <p id="contact-blurb" class="muted"></p>
+        <a id="contact-email" class="btn" href="#">Email me</a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Sections">
+    <button class="tab is-active" data-view="home" aria-current="page">
+      <span class="tab-label">Home</span>
+    </button>
+    <button class="tab" data-view="guide">
+      <span class="tab-label">Guide</span>
+    </button>
+    <button class="tab" data-view="saved">
+      <span class="tab-label">Saved</span>
+    </button>
+    <button class="tab" data-view="contact">
+      <span class="tab-label">Contact</span>
+    </button>
+  </nav>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

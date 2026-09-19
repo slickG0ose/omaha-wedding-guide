@@ -1,0 +1,16 @@
+title = "omaha-wedding-guide secret & PII scan config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "ssn"
+description = "US Social Security Number"
+regex = '''\b\d{3}-\d{2}-\d{4}\b'''
+tags = ["pii"]
+
+[[rules]]
+id = "credit-card"
+description = "Credit card number"
+regex = '''\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b'''
+tags = ["pii"]

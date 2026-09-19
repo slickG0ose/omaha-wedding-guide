@@ -1,0 +1,11 @@
+#!/bin/bash
+# Blocks commits containing secrets/PII, scanned via gitleaks against staged changes.
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks not installed (brew install gitleaks) — refusing to commit without a secret scan." >&2
+  exit 1
+fi
+
+repo_root=$(git rev-parse --show-toplevel)
+gitleaks protect --staged --config "$repo_root/.gitleaks.toml" --redact -v
