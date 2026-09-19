@@ -8,6 +8,18 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Desktop/tablet navigation. Hidden at phone width, where the bottom tab
+       bar takes over — both drive the same .tab buttons. -->
+  <header class="site-header">
+    <span class="brand">Anna &amp; Charlie</span>
+    <nav class="topnav" aria-label="Sections">
+      <button class="tab is-active" data-view="home">Home</button>
+      <button class="tab" data-view="guide">Guide</button>
+      <button class="tab" data-view="saved">Saved</button>
+      <button class="tab" data-view="contact">Contact</button>
+    </nav>
+  </header>
+
   <header class="hero">
     <p class="eyebrow">Welcome to Omaha</p>
     <h1 id="hero-title">Anna & Charlie's Wedding</h1>
@@ -46,7 +58,10 @@
       <div class="card">
         <h2>Questions?</h2>
         <p id="contact-blurb" class="muted"></p>
-        <a id="contact-email" class="btn" href="#">Email me</a>
+        <div class="btn-row">
+          <a id="contact-email" class="btn" href="#">Email me</a>
+          <a id="contact-phone" class="btn btn-secondary" href="#" hidden>Text me</a>
+        </div>
       </div>
     </section>
   </main>

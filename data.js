@@ -21,9 +21,13 @@ const WEDDING = {
   notes: "TODO: any other must-know logistics (parking, shuttle, weather backup, etc.)"
 };
 
+// This repo is public (GitHub Pages on the free tier requires it), so anything
+// here is permanently public and gets scraped. Don't put a personal cell number
+// in this file — use a forwarding number you can throw away after the wedding.
 const CONTACT = {
   name: "Nick",
-  email: "TODO@example.com",
+  email: "nick.konecny1@gmail.com",
+  phone: "",
   blurb: "Questions about the area or the weekend? Reach out."
 };
 

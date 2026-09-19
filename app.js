@@ -155,6 +155,15 @@ function init() {
   emailLink.href = `mailto:${CONTACT.email}`;
   emailLink.textContent = `Email ${CONTACT.name}`;
 
+  // Only rendered when a number is actually set — see the note in data.js about
+  // what belongs in a public repo.
+  const phoneLink = document.getElementById("contact-phone");
+  if (CONTACT.phone) {
+    phoneLink.href = `sms:${CONTACT.phone.replace(/[^\d+]/g, "")}`;
+    phoneLink.textContent = `Text ${CONTACT.name}`;
+    phoneLink.hidden = false;
+  }
+
   renderFilters();
 
   document.querySelectorAll(".tab").forEach((tab) => {

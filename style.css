@@ -34,8 +34,15 @@ html, body {
 }
 
 body {
+  /* Room for the fixed bottom tab bar. Reclaimed at --nav-bp, where the bar
+     is replaced by the sticky header. */
   padding-bottom: 84px;
   min-height: 100vh;
+}
+
+/* Desktop/tablet header — hidden by default, shown at --nav-bp (720px). */
+.site-header {
+  display: none;
 }
 
 .hero {
@@ -263,8 +270,95 @@ main {
   color: var(--muted);
   font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease;
 }
 
 .tab.is-active {
   color: var(--accent);
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-secondary {
+  background: var(--chip-bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+
+/* ---------------------------------------------------------------------------
+   Tablet and up. The bottom tab bar is the right pattern under the thumb on a
+   phone; on a wider screen it's a mobile affordance stranded on a desktop, so
+   the sticky header takes over and the bar goes away. Four short labels fit
+   inline at every width here, so there's nothing for a hamburger to hide.
+   --------------------------------------------------------------------------- */
+@media (min-width: 720px) {
+  body { padding-bottom: 40px; }
+
+  .tabbar { display: none; }
+
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 14px 28px;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand {
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+  }
+
+  .topnav {
+    display: flex;
+    gap: 4px;
+  }
+
+  .topnav .tab {
+    flex: none;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+  }
+
+  .topnav .tab:hover { color: var(--ink); }
+
+  .topnav .tab.is-active {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  main { max-width: 780px; }
+
+  .hero { padding: 48px 20px 28px; }
+  .hero h1 { font-size: 40px; }
+  .hero-date { font-size: 17px; }
+
+  .filters { padding: 4px 0 16px; }
+}
+
+/* Two columns once there's width for them — one long ribbon of cards on a
+   wide screen wastes the space and makes the eye travel further than it needs. */
+@media (min-width: 900px) {
+  main { max-width: 1040px; }
+
+  .place-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .hero h1 { font-size: 46px; }
 }
