@@ -1,0 +1,10 @@
+{
+  "name": "triplist-function",
+  "private": true,
+  "type": "module",
+  "description": "Neon Function fronting trip_lists for the Omaha wedding guide",
+  "dependencies": {
+    "@neon/functions": "^0.11.0",
+    "pg": "^8.13.1"
+  }
+}

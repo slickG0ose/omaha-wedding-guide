@@ -6,13 +6,33 @@ after the wedding weekend, so keep it lightweight.
 
 ## Stack
 
-Plain HTML/CSS/JS. No framework, no build step, no backend. "Save to list"
-uses `localStorage` only — there is no server-side user data.
+Plain HTML/CSS/JS. No framework, no build step. "Save to list" is
+`localStorage` first; a guest can optionally create a trip code to carry that
+list to another device.
 
-Node is a dev-time dependency only (test runner + Playwright). The deployed
-site is four static files. Don't introduce a bundler, a framework, or a
-backend without an explicit decision — "it would be cleaner in React" is not
-one at this size.
+Node is a dev-time dependency only for the site itself (test runner +
+Playwright). The deployed site is four static files.
+
+One exception: `functions/triplist/` is a Neon Function providing trip-code
+sync, deployed separately from the site. It is the only backend, and it exists
+for exactly one job.
+
+## The privacy contract (do not erode this)
+
+Guests never log in. A trip code is 8 random characters mapped to a list of
+place ids — that is the entire record. No names, no emails, no device
+identifiers, no IP logging.
+
+This is what makes a public, unauthenticated endpoint defensible: a guessed
+code leaks a list of restaurants. The moment anything personal is stored, that
+argument fails and the endpoint needs real authentication first. If you are
+asked to add a field, that is a decision to surface, not a change to make.
+
+`data.js` is public forever — public repo, public site, permanent git history.
+Nothing goes in it that shouldn't be posted publicly.
+
+Don't introduce a bundler, a framework, or a second backend without an
+explicit decision — "it would be cleaner in React" is not one at this size.
 
 ## Testing and shipping
 

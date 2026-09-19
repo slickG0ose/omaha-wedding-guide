@@ -278,6 +278,60 @@ main {
   color: var(--accent);
 }
 
+.sync-card {
+  margin-top: 24px;
+}
+
+.sync-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin: 12px 0 4px;
+  word-break: break-all;
+}
+
+.sync-restore {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.sync-restore summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.sync-restore form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.sync-restore input {
+  flex: 1 1 160px;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 16px; /* 16px stops iOS Safari zooming the page on focus */
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sync-restore .btn { margin-top: 0; }
+
+#sync-status:empty { display: none; }
+
+#sync-status.is-error { color: var(--accent); }
+
 .btn-row {
   display: flex;
   flex-wrap: wrap;

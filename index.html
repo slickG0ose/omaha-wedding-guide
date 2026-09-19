@@ -49,9 +49,47 @@
     </section>
 
     <section id="view-saved" class="view" hidden>
-      <p class="section-lede">Your saved spots. Stored privately on this device only.</p>
-      <ul id="saved-list" class="place-list"></ul>
+      <p class="section-lede">Your saved spots. Stored on this device unless you create a trip code.</p>
+      <div id="saved-list"></div>
       <p id="saved-empty" class="muted" hidden>Nothing saved yet — heart something from the Guide tab.</p>
+
+      <div class="card sync-card">
+        <h2>Use this list on another device</h2>
+        <p class="muted small">
+          A trip code stores only your saved spots — no name, no email, nothing
+          that identifies you. Anyone with the code can see the list, so it's a
+          convenience, not a password.
+        </p>
+
+        <div id="sync-idle">
+          <button id="sync-create" class="btn">Create a trip code</button>
+        </div>
+
+        <div id="sync-active" hidden>
+          <p class="sync-code" id="sync-code"></p>
+          <p class="muted small">Enter this code on your other device to load the same list.</p>
+        </div>
+
+        <details class="sync-restore">
+          <summary>I already have a code</summary>
+          <form id="sync-restore-form">
+            <input
+              id="sync-input"
+              type="text"
+              inputmode="latin"
+              maxlength="8"
+              placeholder="ABCD2345"
+              autocapitalize="characters"
+              autocomplete="off"
+              spellcheck="false"
+              aria-label="Trip code"
+            />
+            <button type="submit" class="btn btn-secondary">Load list</button>
+          </form>
+        </details>
+
+        <p id="sync-status" class="muted small" role="status"></p>
+      </div>
     </section>
 
     <section id="view-contact" class="view" hidden>

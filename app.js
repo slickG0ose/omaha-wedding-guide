@@ -1,4 +1,26 @@
 const SAVED_KEY = "omaha-guide-saved-v1";
+const CODE_KEY = "omaha-guide-code-v1";
+
+// Neon Function fronting the trip_lists table. Public by design — the trip code
+// is the only credential, and the stored data is a list of place ids, nothing
+// about the guest. See functions/triplist/index.mjs.
+const SYNC_API = "https://br-icy-surf-b5kfsyd2-triplist.compute.c-7.us-east-2.aws.neon.tech";
+
+function getCode() {
+  try {
+    return localStorage.getItem(CODE_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function setCode(code) {
+  try {
+    localStorage.setItem(CODE_KEY, code);
+  } catch {
+    // Storage unavailable — sync just won't persist past this session.
+  }
+}
 
 // Apple platforms open the Maps app straight from a maps.apple.com link;
 // everywhere else maps.google.com hands off to the Google Maps app when it's
@@ -92,6 +114,76 @@ function renderSaved() {
   empty.hidden = items.length > 0;
 }
 
+function setSyncStatus(message, isError = false) {
+  const el = document.getElementById("sync-status");
+  el.textContent = message;
+  el.classList.toggle("is-error", isError);
+}
+
+function renderSyncState() {
+  const code = getCode();
+  document.getElementById("sync-idle").hidden = Boolean(code);
+  document.getElementById("sync-active").hidden = !code;
+  if (code) document.getElementById("sync-code").textContent = code;
+}
+
+async function syncRequest(path, options) {
+  const res = await fetch(`${SYNC_API}${path}`, options);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || `request failed (${res.status})`);
+  return body;
+}
+
+async function createTripCode() {
+  setSyncStatus("Creating your code…");
+  try {
+    const body = await syncRequest("/list", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ placeIds: [...getSaved()] })
+    });
+    setCode(body.code);
+    renderSyncState();
+    setSyncStatus("Code created. Your list will keep itself up to date.");
+  } catch (err) {
+    setSyncStatus(`Couldn't create a code: ${err.message}`, true);
+  }
+}
+
+async function restoreTripCode(rawCode) {
+  const code = rawCode.trim().toUpperCase();
+  if (!/^[A-Z0-9]{8}$/.test(code)) {
+    setSyncStatus("That doesn't look like a trip code — they're 8 letters and numbers.", true);
+    return;
+  }
+
+  setSyncStatus("Looking up your list…");
+  try {
+    const body = await syncRequest(`/list?code=${encodeURIComponent(code)}`);
+    setSaved(new Set(body.placeIds));
+    setCode(code);
+    renderSyncState();
+    renderSaved();
+    setSyncStatus(`Loaded ${body.placeIds.length} saved spot${body.placeIds.length === 1 ? "" : "s"}.`);
+  } catch (err) {
+    const message = err.message === "not found" ? "No list found for that code." : err.message;
+    setSyncStatus(message, true);
+  }
+}
+
+// Fire-and-forget: a failed push must never block the heart from toggling, so
+// the local list stays the source of truth and this catches up when it can.
+function pushSync() {
+  const code = getCode();
+  if (!code) return;
+
+  syncRequest("/list", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ code, placeIds: [...getSaved()] })
+  }).catch(() => setSyncStatus("Saved on this device — couldn't reach sync just now.", true));
+}
+
 function currentGuideFilter() {
   return document.querySelector(".chip.is-active")?.dataset.filter || "all";
 }
@@ -183,8 +275,17 @@ function init() {
     if (!btn) return;
     toggleSaved(btn.dataset.id);
     refreshVisibleLists();
+    pushSync();
   });
 
+  document.getElementById("sync-create").addEventListener("click", createTripCode);
+
+  document.getElementById("sync-restore-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    restoreTripCode(document.getElementById("sync-input").value);
+  });
+
+  renderSyncState();
   renderGuide("all");
 }
 

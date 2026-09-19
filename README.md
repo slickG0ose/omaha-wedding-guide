@@ -47,6 +47,25 @@ gate.
 These run automatically on every push to `main`, and the site only redeploys
 if they pass.
 
+## Trip codes (cross-device favorites)
+
+Guests save spots to their own device. If they want the same list on another
+phone or laptop, they tap **Create a trip code** and type that 8-character code
+on the other device.
+
+There are no accounts. The code maps to a list of place IDs and nothing else —
+no name, no email, nothing identifying. Anyone with a code can read that list,
+so it's a convenience, not a password.
+
+The backend is a single Neon Function in `functions/triplist/`. To redeploy it
+after a change:
+
+```bash
+npx neon@latest functions deploy triplist --src functions/triplist/index.mjs --project-id royal-bonus-86892585
+```
+
+After the wedding, deleting the Neon project removes every guest list at once.
+
 ## Deploying
 
 Plain static files (`index.html`, `style.css`, `app.js`, `data.js`) — deploy
