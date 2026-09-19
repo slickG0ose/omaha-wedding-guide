@@ -174,10 +174,43 @@ main {
 
 .place-main { flex: 1; min-width: 0; }
 
+.group-heading {
+  margin: 20px 4px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.group:first-child .group-heading { margin-top: 8px; }
+
+.place-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 4px;
+}
+
 .place-name {
   font-weight: 600;
   font-size: 16px;
-  margin: 0 0 4px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.place-tag {
+  flex: none;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
 }
 
 .place-blurb {
