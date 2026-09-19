@@ -9,6 +9,34 @@ after the wedding weekend, so keep it lightweight.
 Plain HTML/CSS/JS. No framework, no build step, no backend. "Save to list"
 uses `localStorage` only — there is no server-side user data.
 
+Node is a dev-time dependency only (test runner + Playwright). The deployed
+site is four static files. Don't introduce a bundler, a framework, or a
+backend without an explicit decision — "it would be cleaner in React" is not
+one at this size.
+
+## Testing and shipping
+
+Two suites, both fast, both required before anything reaches guests:
+
+- `npm test` — content integrity over `data.js` and `style.css`
+  (~30ms, no browser). Catches duplicate ids, categories that don't exist,
+  missing fields, and colors that can't flip to dark mode.
+- `npm run test:e2e` — Playwright smoke specs: tabs render, filters narrow,
+  saving persists across reload, every maps link is well-formed, no
+  horizontal scroll at phone width.
+- `npm run check:ready` — advisory list of TODOs still visible to guests.
+  Never blocks; run it before sending the link to anyone.
+
+Push to `main` runs both suites in CI and only deploys to GitHub Pages if
+they pass. A red test means the live site keeps serving the last good
+version — that's the point, don't work around it.
+
+## Done criteria
+
+A content or UI change is done when: `npm run test:all` passes, the change
+was actually looked at in a browser at phone width, and `npm run check:ready`
+doesn't show a new TODO you introduced.
+
 ## Structure
 
 - `index.html` — markup / view containers (home, guide, saved, contact)

@@ -29,10 +29,23 @@ No build step. Editing `data.js` and refreshing the page is the whole loop.
 ## Running locally
 
 ```bash
-python3 -m http.server 4173
+npm run dev
 ```
 
 Then open http://localhost:4173.
+
+## Before you send the link to anyone
+
+```bash
+npm run test:all && npm run check:ready
+```
+
+`test:all` runs the content checks and the browser smoke tests. `check:ready`
+lists anything still marked TODO that a guest would see — it's a report, not a
+gate.
+
+These run automatically on every push to `main`, and the site only redeploys
+if they pass.
 
 ## Deploying
 

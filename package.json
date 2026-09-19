@@ -1,0 +1,16 @@
+{
+  "name": "omaha-wedding-guide",
+  "private": true,
+  "type": "module",
+  "description": "Static mobile guide for Anna & Charlie's wedding weekend",
+  "scripts": {
+    "dev": "python3 -m http.server 4173",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "test:all": "npm test && npm run test:e2e",
+    "check:ready": "node scripts/launch-readiness.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}
