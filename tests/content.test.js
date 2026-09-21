@@ -10,10 +10,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 // load it with a <script> tag. Evaluate it the same way the page does.
 function loadData() {
   const src = readFileSync(join(root, "data.js"), "utf8");
-  return new Function(`${src}; return { WEDDING, CONTACT, CATEGORIES, PLACES };`)();
+  return new Function(`${src}; return { WEDDING, CONTACT, REHEARSAL, CATEGORIES, PLACES };`)();
 }
 
-const { WEDDING, CONTACT, CATEGORIES, PLACES } = loadData();
+const { WEDDING, CONTACT, REHEARSAL, CATEGORIES, PLACES } = loadData();
 
 describe("categories", () => {
   test("every category has an id, label, and heading", () => {
@@ -72,6 +72,19 @@ describe("wedding details", () => {
 
   test("contact email looks like an address", () => {
     assert.match(CONTACT.email, /^[^@\s]+@[^@\s]+\.[^@\s]+$/, "CONTACT.email is not a valid address");
+  });
+
+  // The rehearsal card is optional, but a half-defined one renders a card with
+  // a dead directions link — worse than no card at all.
+  test("rehearsal card is either absent or complete enough to render", () => {
+    if (!REHEARSAL) return;
+    for (const field of ["title", "date", "venueName"]) {
+      assert.ok(REHEARSAL[field], `REHEARSAL.${field} is empty`);
+    }
+    assert.ok(
+      REHEARSAL.venueQuery || REHEARSAL.venueName,
+      "REHEARSAL needs a venueQuery or venueName for the maps link"
+    );
   });
 });
 

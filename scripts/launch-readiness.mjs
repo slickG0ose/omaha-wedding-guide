@@ -11,8 +11,8 @@ import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const src = readFileSync(join(root, "data.js"), "utf8");
-const { WEDDING, CONTACT, PLACES } = new Function(
-  `${src}; return { WEDDING, CONTACT, PLACES };`
+const { WEDDING, CONTACT, REHEARSAL, PLACES } = new Function(
+  `${src}; return { WEDDING, CONTACT, REHEARSAL, PLACES };`
 )();
 
 const isTodo = (v) => typeof v === "string" && v.includes("TODO");
@@ -23,6 +23,13 @@ for (const [key, value] of Object.entries(WEDDING)) {
 }
 for (const [key, value] of Object.entries(CONTACT)) {
   if (isTodo(value)) findings.push(`CONTACT.${key} — ${value}`);
+}
+if (REHEARSAL) {
+  for (const [key, value] of Object.entries(REHEARSAL)) {
+    if (isTodo(value)) findings.push(`REHEARSAL.${key} — ${value}`);
+  }
+  // Empty time is a deliberate "Time TBD" on the page, but still unfinished.
+  if (!REHEARSAL.time) findings.push('REHEARSAL.time — empty, so the card shows "Time TBD"');
 }
 for (const place of PLACES) {
   const fields = ["name", "blurb", "query"].filter((f) => isTodo(place[f]));

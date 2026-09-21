@@ -21,6 +21,19 @@ const WEDDING = {
   notes: "TODO: any other must-know logistics (parking, shuttle, weather backup, etc.)"
 };
 
+// Optional second card on the home screen. Set REHEARSAL to null to remove it
+// entirely. Leave `time` empty and the card shows "Time TBD" rather than a
+// half-filled field — `npm run check:ready` still reminds you it's unset.
+const REHEARSAL = {
+  title: "Rehearsal Dinner",
+  date: "Friday, October 2, 2026",
+  time: "",
+  venueName: "Upstream Brewing Company",
+  venueArea: "Old Market, downtown Omaha",
+  venueQuery: "Upstream Brewing Company Old Market Omaha",
+  notes: "TODO: who's invited, and anything else people need to know"
+};
+
 // This repo is public (GitHub Pages on the free tier requires it), so anything
 // here is permanently public and gets scraped. Don't put a personal cell number
 // in this file — use a forwarding number you can throw away after the wedding.

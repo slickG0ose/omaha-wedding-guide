@@ -12,6 +12,17 @@ test("home shows the wedding details", async ({ page }) => {
   await expect(page.locator("#venue-maps-link")).toHaveAttribute("href", /maps\.(google|apple)\.com/);
 });
 
+test("the rehearsal dinner card renders with a working directions link", async ({ page }) => {
+  const card = page.locator("#rehearsal-card");
+  await expect(card).toBeVisible();
+  await expect(page.locator("#rehearsal-title")).not.toBeEmpty();
+  await expect(page.locator("#rehearsal-date")).toContainText("October 2");
+  await expect(page.locator("#rehearsal-maps-link")).toHaveAttribute(
+    "href",
+    /^https:\/\/maps\.(google|apple)\.com\/\?q=.+/
+  );
+});
+
 test("guide renders every category section", async ({ page }) => {
   await page.getByRole("button", { name: "Guide" }).click();
   const headings = page.locator(".group-heading");

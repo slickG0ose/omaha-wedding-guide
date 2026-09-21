@@ -94,6 +94,15 @@ main {
 
 .card h2 { margin: 0 0 4px; font-size: 20px; }
 
+.card-eyebrow {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
 .muted { color: var(--muted); }
 .small { font-size: 13px; }
 

@@ -239,8 +239,28 @@ function initWeddingCard() {
   document.getElementById("wedding-notes").textContent = WEDDING.notes || "";
 }
 
+function initRehearsalCard() {
+  const card = document.getElementById("rehearsal-card");
+  // REHEARSAL is optional — a guide without one just doesn't render the card.
+  if (typeof REHEARSAL === "undefined" || !REHEARSAL) return;
+
+  document.getElementById("rehearsal-date").textContent = REHEARSAL.date || "";
+  document.getElementById("rehearsal-title").textContent = REHEARSAL.title;
+  document.getElementById("rehearsal-venue").textContent = [REHEARSAL.venueName, REHEARSAL.venueArea]
+    .filter(Boolean)
+    .join(" · ");
+  document.getElementById("rehearsal-maps-link").href = mapsHref(
+    REHEARSAL.venueQuery || REHEARSAL.venueName
+  );
+  document.getElementById("rehearsal-time").textContent = REHEARSAL.time || "Time TBD";
+  document.getElementById("rehearsal-notes").textContent = REHEARSAL.notes || "";
+
+  card.hidden = false;
+}
+
 function init() {
   initWeddingCard();
+  initRehearsalCard();
 
   document.getElementById("contact-blurb").textContent = CONTACT.blurb;
   const emailLink = document.getElementById("contact-email");
