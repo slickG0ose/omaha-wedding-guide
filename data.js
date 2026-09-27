@@ -35,7 +35,7 @@ const WEDDING = {
 };
 
 // Optional second card on the home screen. Set REHEARSAL to null to remove it
-// entirely. Leave `time` empty and the card shows "Time TBD" rather than a
+// entirely. Leave `time` empty and the card shows "Time coming soon" rather than a
 // half-filled field — `npm run check:ready` still reminds you it's unset.
 const REHEARSAL = {
   title: "Rehearsal Dinner",
@@ -44,9 +44,6 @@ const REHEARSAL = {
   venueName: "Upstream Brewing Company",
   venueArea: "Old Market, downtown Omaha",
   venueQuery: "Upstream Brewing Company Old Market Omaha",
-  // Reception playlist — a Spotify / Apple Music / YouTube link. Leave empty
-  // and the button doesn't show. Must start with https://.
-  playlistUrl: "https://open.spotify.com/playlist/0xhs4DiM4w87j6lkz5v8F5",
   notes: "TODO: who's invited, and anything else people need to know"
 };
 
