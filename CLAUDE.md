@@ -44,7 +44,8 @@ Two suites, both fast, both required before anything reaches guests:
 - `npm run test:e2e` — Playwright smoke specs: tabs render, filters narrow,
   saving persists across reload, every maps link is well-formed, no
   horizontal scroll at phone width.
-- `npm run check:ready` — advisory list of TODOs still visible to guests.
+- `npm run check:ready` — advisory list of unfinished wedding details
+  (hidden from guests until filled), empty groups, and picks per section.
   Never blocks; run it before sending the link to anyone.
 
 Push to `main` runs both suites in CI and only deploys to GitHub Pages if
@@ -61,7 +62,7 @@ doesn't show a new TODO you introduced.
 
 - `index.html` — markup / view containers (home, guide, saved, contact)
 - `style.css` — mobile-first styles, light/dark via `prefers-color-scheme`
-- `app.js` — view switching, filtering, localStorage save/unsave
+- `app.js` — hash routing, section/group rendering, localStorage save/unsave
 - `data.js` — all editable content (wedding details, contact, places list)
 
 Content edits belong in `data.js` only. Don't hardcode wedding/venue/place

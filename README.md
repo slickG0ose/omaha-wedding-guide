@@ -12,12 +12,23 @@ Everything content-related lives in [`data.js`](data.js):
 - `WEDDING` — venue, times, hotel block, dress code, notes. Replace every
   `TODO`.
 - `CONTACT` — your name/email for the Contact tab.
-- `CATEGORIES` — the tabs and section order on the Guide screen. Currently
-  Classics, Food, Outdoors, Music & Arts.
-- `PLACES` — array of recommendation cards. Each needs `id` (unique),
-  `category` (matching a `CATEGORIES` id), `name`, `blurb`, and `query`.
-  Optional `tag` renders a small pill (e.g. `Active`, `Laid-back`, `Coffee`).
-  Add/remove/reorder freely.
+- `CATEGORIES` — the three Guide sections (Food & Drink, Things to Do,
+  Entertainment) and the groups inside each (Coffee & Breakfast, Dinner,
+  Bars & Breweries, Live Music & Shows, ...). Rename, add, or reorder freely.
+- `PLACES` — the recommendation cards. Each needs `id` (unique), `category`
+  and `group` (matching ids in `CATEGORIES`), `name`, `blurb`, and `query`.
+  Optional:
+  - `pick: true` — marks it as **your** recommendation: "Nick's pick" badge,
+    sorted to the top of its group.
+  - `tip` — one line in your own voice (what to order, when to go).
+  - `tag` — small pill (`Steak`, `Free`, `Hike`).
+
+  There's a copy-paste template at the top of the Food & Drink block.
+
+Empty groups are hidden from guests, so a slot you haven't filled yet just
+doesn't show. Any `WEDDING` field still marked `TODO` is hidden too (times
+show "Time coming soon"), so the link is safe to share while details are
+still landing.
 
 `query` is just what you'd type into a maps search box — a place name or a
 street address. The site builds the link at tap time: Apple Maps on
@@ -41,8 +52,11 @@ npm run test:all && npm run check:ready
 ```
 
 `test:all` runs the content checks and the browser smoke tests. `check:ready`
-lists anything still marked TODO that a guest would see — it's a report, not a
-gate.
+lists unfinished wedding details, empty groups, and how many picks you've
+marked per section — it's a report, not a gate.
+
+Links can point at a section directly: `…/omaha-wedding-guide/#guide/eat`,
+`#guide/do`, `#guide/fun`, `#saved`, `#contact`.
 
 These run automatically on every push to `main`, and the site only redeploys
 if they pass.

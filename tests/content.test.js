@@ -16,11 +16,20 @@ function loadData() {
 const { WEDDING, CONTACT, REHEARSAL, CATEGORIES, PLACES } = loadData();
 
 describe("categories", () => {
-  test("every category has an id, label, and heading", () => {
+  test("every category has an id, label, heading, and at least one group", () => {
     for (const cat of CATEGORIES) {
       assert.ok(cat.id, "category missing id");
       assert.ok(cat.label, `category ${cat.id} missing label`);
       assert.ok(cat.heading, `category ${cat.id} missing heading`);
+      assert.ok(cat.groups?.length, `category ${cat.id} has no groups`);
+      for (const g of cat.groups) assert.ok(g.id && g.label, `category ${cat.id} has a group missing id/label`);
+    }
+  });
+
+  test("group ids are unique within their category", () => {
+    for (const cat of CATEGORIES) {
+      const ids = cat.groups.map((g) => g.id);
+      assert.equal(new Set(ids).size, ids.length, `duplicate group id in ${cat.id}`);
     }
   });
 
@@ -40,7 +49,7 @@ describe("categories", () => {
 describe("places", () => {
   test("every place has the fields the card renders", () => {
     for (const place of PLACES) {
-      for (const field of ["id", "category", "name", "blurb", "query"]) {
+      for (const field of ["id", "category", "group", "name", "blurb", "query"]) {
         assert.ok(place[field], `place ${place.id || "(no id)"} missing "${field}"`);
       }
     }
@@ -50,6 +59,29 @@ describe("places", () => {
     const ids = PLACES.map((p) => p.id);
     const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
     assert.deepEqual(dupes, [], `duplicate place id(s) — saved favorites would collide`);
+  });
+
+  // A group that doesn't exist in its category means the card never renders —
+  // the same silent-vanish failure as a bad category.
+  test("every place points at a real group in its category", () => {
+    for (const place of PLACES) {
+      const cat = CATEGORIES.find((c) => c.id === place.category);
+      if (!cat) continue; // reported by the category test below
+      assert.ok(
+        cat.groups.some((g) => g.id === place.group),
+        `place "${place.id}" has group "${place.group}", which isn't in category "${cat.id}"`
+      );
+    }
+  });
+
+  test("no TODO placeholders in place cards", () => {
+    // WEDDING TODOs are hidden from guests by the page; place cards aren't, so a
+    // TODO there would print verbatim.
+    for (const place of PLACES) {
+      for (const field of ["name", "blurb", "tip", "tag", "query"]) {
+        assert.ok(!String(place[field] ?? "").includes("TODO"), `place "${place.id}" has a TODO in "${field}"`);
+      }
+    }
   });
 
   test("every place points at a real category", () => {

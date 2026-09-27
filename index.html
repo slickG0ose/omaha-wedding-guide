@@ -4,7 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Anna & Charlie's Wedding — Omaha Guide</title>
-  <meta name="theme-color" content="#2b2420" />
+  <meta name="description" content="Wedding-weekend details plus where to eat, what to do, and where to go out around Omaha and Council Bluffs." />
+  <meta property="og:title" content="Anna & Charlie's Wedding — Omaha Guide" />
+  <meta property="og:description" content="Wedding-weekend details plus where to eat, what to do, and where to go out around Omaha." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#f7f2ea" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#17130f" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23a8452f'/><text x='16' y='22' font-family='Georgia,serif' font-size='16' text-anchor='middle' fill='white'>A&amp;C</text></svg>" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -15,54 +21,69 @@
     <nav class="topnav" aria-label="Sections">
       <button class="tab is-active" data-view="home">Home</button>
       <button class="tab" data-view="guide">Guide</button>
-      <button class="tab" data-view="saved">Saved</button>
+      <button class="tab" data-view="saved">Saved <span class="saved-count" hidden></span></button>
       <button class="tab" data-view="contact">Contact</button>
     </nav>
   </header>
 
-  <header class="hero">
-    <p class="eyebrow">Welcome to Omaha</p>
-    <h1 id="hero-title">Anna & Charlie's Wedding</h1>
-    <p class="hero-date" id="hero-date"></p>
-  </header>
-
   <main id="views">
     <section id="view-home" class="view">
-      <div class="card">
+      <header class="hero">
+        <p class="eyebrow">Welcome to Omaha</p>
+        <h1 id="hero-title">Anna &amp; Charlie</h1>
+        <p class="hero-date" id="hero-date"></p>
+      </header>
+
+      <div class="card card-feature">
+        <p class="card-eyebrow">The wedding</p>
         <h2 id="venue-name"></h2>
         <p id="venue-address" class="muted"></p>
-        <a id="venue-maps-link" class="btn" href="#" target="_blank" rel="noopener">Get directions</a>
         <dl class="detail-list">
-          <div><dt>Ceremony</dt><dd id="ceremony-time"></dd></div>
-          <div><dt>Reception</dt><dd id="reception-time"></dd></div>
+          <div id="ceremony-row"><dt>Ceremony</dt><dd id="ceremony-time"></dd></div>
+          <div id="reception-row"><dt>Reception</dt><dd id="reception-time"></dd></div>
           <div id="dress-row"><dt>Dress code</dt><dd id="dress-code"></dd></div>
           <div id="hotel-row"><dt>Where to stay</dt><dd id="hotel-block"></dd></div>
         </dl>
         <p id="wedding-notes" class="muted small"></p>
+        <a id="venue-maps-link" class="btn" href="#" target="_blank" rel="noopener">Get directions</a>
       </div>
 
       <div class="card" id="rehearsal-card" hidden>
         <p class="card-eyebrow" id="rehearsal-date"></p>
         <h2 id="rehearsal-title"></h2>
         <p id="rehearsal-venue" class="muted"></p>
-        <a id="rehearsal-maps-link" class="btn btn-secondary" href="#" target="_blank" rel="noopener">Get directions</a>
         <dl class="detail-list">
-          <div><dt>Time</dt><dd id="rehearsal-time"></dd></div>
+          <div id="rehearsal-time-row"><dt>Time</dt><dd id="rehearsal-time"></dd></div>
         </dl>
         <p id="rehearsal-notes" class="muted small"></p>
+        <a id="rehearsal-maps-link" class="btn btn-secondary" href="#" target="_blank" rel="noopener">Get directions</a>
       </div>
-      <p class="section-lede">Head to the Guide for classic Omaha stops, food, trails and overlooks, and where to catch live music. Tap the heart to save anything to your list — it stays on this phone.</p>
+
+      <h2 class="home-heading">While you're in town</h2>
+      <p class="section-lede">Local recommendations, sorted. Tap the heart on anything to save it to your list.</p>
+      <nav id="home-sections" class="section-tiles" aria-label="Guide sections"></nav>
     </section>
 
     <section id="view-guide" class="view" hidden>
-      <div class="filters" id="filters" aria-label="Category"></div>
+      <header class="view-header">
+        <h1>The Guide</h1>
+        <p class="muted">Where to eat, what to do, and where to go out.</p>
+      </header>
+      <div class="filters" id="filters" role="toolbar" aria-label="Filter by section"></div>
       <div id="place-list"></div>
     </section>
 
     <section id="view-saved" class="view" hidden>
-      <p class="section-lede">Your saved spots. Stored on this device unless you create a trip code.</p>
+      <header class="view-header">
+        <h1>Your list</h1>
+        <p class="muted">Saved on this device unless you create a trip code.</p>
+      </header>
       <div id="saved-list"></div>
-      <p id="saved-empty" class="muted" hidden>Nothing saved yet — heart something from the Guide tab.</p>
+      <div id="saved-empty" class="empty-state" hidden>
+        <p>Nothing saved yet.</p>
+        <p class="muted small">Tap the heart on anything in the Guide and it shows up here.</p>
+        <a class="btn" href="#guide">Browse the Guide</a>
+      </div>
 
       <div class="card sync-card">
         <h2>Use this list on another device</h2>
@@ -104,8 +125,11 @@
     </section>
 
     <section id="view-contact" class="view" hidden>
+      <header class="view-header">
+        <h1>Questions?</h1>
+      </header>
       <div class="card">
-        <h2>Questions?</h2>
+        <h2 id="contact-heading"></h2>
         <p id="contact-blurb" class="muted"></p>
         <div class="btn-row">
           <a id="contact-email" class="btn" href="#">Email me</a>
@@ -117,15 +141,19 @@
 
   <nav class="tabbar" aria-label="Sections">
     <button class="tab is-active" data-view="home" aria-current="page">
+      <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
       <span class="tab-label">Home</span>
     </button>
     <button class="tab" data-view="guide">
+      <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
       <span class="tab-label">Guide</span>
     </button>
     <button class="tab" data-view="saved">
+      <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.5-4.6-9.2-9.4C1.6 7.4 3.8 4 7.2 4c2 0 3.6 1.1 4.8 2.8C13.2 5.1 14.8 4 16.8 4c3.4 0 5.6 3.4 4.4 6.9-1.7 4.8-9.2 9.4-9.2 9.4z"/></svg><span class="saved-count" hidden></span>
       <span class="tab-label">Saved</span>
     </button>
     <button class="tab" data-view="contact">
+      <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>
       <span class="tab-label">Contact</span>
     </button>
   </nav>

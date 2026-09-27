@@ -14,8 +14,8 @@ live|https://slickg0ose.github.io/omaha-wedding-guide/
 
 ## Structure
 index.html|Markup and the four view containers|{view-home,view-guide,view-saved,view-contact}
-data.js|ALL editable content — the only file content edits belong in|{WEDDING,CONTACT,CATEGORIES,PLACES}
-app.js|View switching, category filtering, maps links, localStorage save list|{mapsHref,placeCard,renderGuide,renderSaved,showView,init}
+data.js|ALL editable content — the only file content edits belong in|{WEDDING,REHEARSAL,CONTACT,CATEGORIES,PLACES}
+app.js|Hash routing, category/group rendering, maps links, localStorage save list|{mapsHref,isUnset,placeCard,renderGuide,renderSaved,showView,routeFromHash,navigate,init}
 style.css|Mobile-first styles; every color is a custom property on :root|{--bg,--ink,--accent,--card,--border}
 tests/content.test.js|node:test suite over data.js + style.css — runs in ~30ms, no browser|
 e2e/smoke.spec.js|Playwright specs — tabs, filters, save persistence, maps links, phone-width overflow|
@@ -24,7 +24,7 @@ functions/triplist/index.mjs|Neon Function: the ONLY backend. Trip-code sync, st
 .github/workflows/ci.yml|Test job gates the Pages deploy job|
 
 ## Key Files
-data.js|Wedding details, categories, and all 26 places|Any content change
+data.js|Wedding details, categories + groups, and all places|Any content change
 app.js|mapsHref() decides Apple Maps vs Google Maps by user agent|Understanding map deep links
 app.js|getSaved/setSaved/toggleSaved wrap localStorage in try/catch|Understanding the save list
 style.css|:root token block + prefers-color-scheme override|Any color or theme change
@@ -32,8 +32,10 @@ tests/content.test.js|What "valid content" means mechanically|Before hand-editin
 CLAUDE.md|Project conventions, hard rules, done criteria|Understanding workflow
 
 ## Navigate
-content|data.js — WEDDING (venue/times), CONTACT (email), CATEGORIES (tabs), PLACES (cards)
-categories|data.js CATEGORIES — currently classics, eat, outdoors, culture
+content|data.js — WEDDING (venue/times), CONTACT (email), CATEGORIES (sections + groups), PLACES (cards; optional pick/tip/tag)
+categories|data.js CATEGORIES — eat, do, fun; each has groups[]. Empty groups are hidden on the page
+routing|app.js routeFromHash / navigate — #guide/<category>, #saved, #contact; back button works
+unfinished|app.js isUnset — any TODO/empty WEDDING/REHEARSAL field is hidden from guests, never printed
 maps-links|app.js mapsHref() — maps.apple.com on iPhone/iPad/Mac, maps.google.com elsewhere
 favorites|app.js SAVED_KEY / getSaved / setSaved / toggleSaved — localStorage, local-first
 theming|style.css :root and the `prefers-color-scheme: dark` block
@@ -52,7 +54,8 @@ database|Neon project royal-bonus-86892585 (aws-us-east-2), table trip_lists(cod
 - Content lives in data.js only. Never hardcode a place, time, or address into index.html or app.js.
 - data.js is public forever (public repo + public site). No personal phone numbers or anything you wouldn't post publicly.
 - Every place needs a unique `id` — the save list keys off it, so a duplicate collides two cards.
-- Every place's `category` must match a CATEGORIES id, or the card silently vanishes from the guide.
+- Every place's `category` must match a CATEGORIES id and its `group` must exist in that category, or the card silently vanishes from the guide.
+- Guests never see the string "TODO". Wedding fields are hidden via isUnset(); place cards can't contain TODO at all (npm test enforces it).
 - `query` is a maps search string, not a URL. app.js builds the platform-correct URL at tap time.
 - Colors are defined once as custom properties. A raw hex outside a `--var` can't flip to dark mode and fails `npm test`.
 - Favorites stay on the device until a guest opts in by creating a trip code. Even then, only place ids leave the browser.

@@ -53,21 +53,32 @@ function toggleSaved(id) {
   setSaved(saved);
 }
 
+const HEART = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.5-4.6-9.2-9.4C1.6 7.4 3.8 4 7.2 4c2 0 3.6 1.1 4.8 2.8C13.2 5.1 14.8 4 16.8 4c3.4 0 5.6 3.4 4.4 6.9-1.7 4.8-9.2 9.4-9.2 9.4z"/></svg>`;
+
+// A field still holding a TODO placeholder (or left empty) isn't ready for
+// guests. The page hides it instead of printing "TODO: ..." to the world;
+// `npm run check:ready` is where Nick sees what's left.
+function isUnset(value) {
+  return !value || String(value).includes("TODO");
+}
+
 function placeCard(place, isSaved) {
   const href = mapsHref(place.query);
   const li = document.createElement("li");
-  li.className = "place-card";
+  li.className = `place-card${place.pick ? " is-pick" : ""}`;
   li.innerHTML = `
     <div class="place-main">
-      <div class="place-head">
-        <a class="place-name" href="${href}" target="_blank" rel="noopener">${place.name}</a>
+      ${place.pick ? `<p class="pick-badge">${CONTACT.name}'s pick</p>` : ""}
+      <a class="place-name" href="${href}" target="_blank" rel="noopener">${place.name}</a>
+      <p class="place-blurb">${place.blurb}</p>
+      ${place.tip ? `<p class="place-tip">${place.tip}</p>` : ""}
+      <div class="place-meta">
+        <a class="place-link" href="${href}" target="_blank" rel="noopener">Directions</a>
         ${place.tag ? `<span class="place-tag">${place.tag}</span>` : ""}
       </div>
-      <p class="place-blurb">${place.blurb}</p>
-      <a class="place-link" href="${href}" target="_blank" rel="noopener">Open in Maps →</a>
     </div>
-    <button class="save-btn ${isSaved ? "is-saved" : ""}" data-id="${place.id}" aria-pressed="${isSaved}" aria-label="Save ${place.name}">
-      ${isSaved ? "♥" : "♡"}
+    <button class="save-btn ${isSaved ? "is-saved" : ""}" data-id="${place.id}" aria-pressed="${isSaved}" aria-label="${isSaved ? "Remove" : "Save"} ${place.name}">
+      ${HEART}
     </button>
   `;
   return li;
@@ -80,6 +91,11 @@ function placeList(places, saved) {
   return ul;
 }
 
+// Nick's picks lead their group; everything else keeps data.js order.
+function byPickFirst(a, b) {
+  return Number(Boolean(b.pick)) - Number(Boolean(a.pick));
+}
+
 function renderGuide(filter) {
   const container = document.getElementById("place-list");
   const saved = getSaved();
@@ -88,14 +104,32 @@ function renderGuide(filter) {
   CATEGORIES
     .filter((cat) => filter === "all" || cat.id === filter)
     .forEach((cat) => {
-      const places = PLACES.filter((p) => p.category === cat.id);
-      if (!places.length) return;
+      const inCategory = PLACES.filter((p) => p.category === cat.id);
+      if (!inCategory.length) return;
+
       const section = document.createElement("section");
       section.className = "group";
-      const heading = document.createElement("h2");
-      heading.className = "group-heading";
-      heading.textContent = cat.heading;
-      section.append(heading, placeList(places, saved));
+      section.innerHTML = `
+        <h2 class="group-heading">${cat.heading}</h2>
+        ${cat.intro ? `<p class="group-intro">${cat.intro}</p>` : ""}
+      `;
+
+      // Empty groups are skipped, so an unfilled slot never shows up as a
+      // heading with nothing under it.
+      (cat.groups || [{ id: null, label: "" }]).forEach((group) => {
+        const places = inCategory
+          .filter((p) => group.id === null || p.group === group.id)
+          .sort(byPickFirst);
+        if (!places.length) return;
+        if (group.label) {
+          const sub = document.createElement("h3");
+          sub.className = "subgroup-heading";
+          sub.textContent = group.label;
+          section.appendChild(sub);
+        }
+        section.appendChild(placeList(places, saved));
+      });
+
       container.appendChild(section);
     });
 }
@@ -112,6 +146,32 @@ function renderSaved() {
   container.innerHTML = "";
   if (items.length) container.appendChild(placeList(items, saved));
   empty.hidden = items.length > 0;
+  updateSavedCount(saved.size);
+}
+
+function updateSavedCount(n) {
+  document.querySelectorAll(".saved-count").forEach((el) => {
+    el.textContent = n ? String(n) : "";
+    el.hidden = !n;
+  });
+}
+
+function renderHomeSections() {
+  const nav = document.getElementById("home-sections");
+  nav.innerHTML = "";
+  CATEGORIES.forEach((cat) => {
+    const count = PLACES.filter((p) => p.category === cat.id).length;
+    if (!count) return;
+    const a = document.createElement("a");
+    a.className = "section-tile";
+    a.href = `#guide/${cat.id}`;
+    a.innerHTML = `
+      <span class="section-tile-label">${cat.label}</span>
+      <span class="section-tile-intro">${cat.intro || ""}</span>
+      <span class="section-tile-count">${count} spots →</span>
+    `;
+    nav.appendChild(a);
+  });
 }
 
 function setSyncStatus(message, isError = false) {
@@ -191,17 +251,63 @@ function currentGuideFilter() {
 function refreshVisibleLists() {
   if (!document.getElementById("view-guide").hidden) renderGuide(currentGuideFilter());
   if (!document.getElementById("view-saved").hidden) renderSaved();
+  else updateSavedCount(getSaved().size);
 }
 
-function showView(name) {
+function setActiveChip(filter) {
+  document.querySelectorAll(".chip").forEach((c) => {
+    const on = c.dataset.filter === filter;
+    c.classList.toggle("is-active", on);
+    c.setAttribute("aria-pressed", String(on));
+  });
+  // Keep the active chip in view when the row is wider than a phone screen.
+  const active = document.querySelector(".chip.is-active");
+  const row = document.getElementById("filters");
+  if (active && row.scrollWidth > row.clientWidth) {
+    row.scrollLeft = active.offsetLeft - (row.clientWidth - active.offsetWidth) / 2;
+  }
+}
+
+const VIEWS = ["home", "guide", "saved", "contact"];
+
+function showView(name, filter) {
+  if (!VIEWS.includes(name)) name = "home";
   document.querySelectorAll(".view").forEach((v) => {
     v.hidden = v.id !== `view-${name}`;
   });
   document.querySelectorAll(".tab").forEach((t) => {
-    t.classList.toggle("is-active", t.dataset.view === name);
+    const on = t.dataset.view === name;
+    t.classList.toggle("is-active", on);
+    if (on) t.setAttribute("aria-current", "page");
+    else t.removeAttribute("aria-current");
   });
-  if (name === "guide") renderGuide(currentGuideFilter());
+  document.body.dataset.view = name;
+  if (name === "guide") {
+    if (filter) setActiveChip(filter);
+    renderGuide(currentGuideFilter());
+  }
   if (name === "saved") renderSaved();
+  window.scrollTo(0, 0);
+}
+
+// The hash is the source of truth for the current view, so the back button
+// works and "#guide/eat" is a link Nick can text to someone.
+function routeFromHash() {
+  const [view, filter] = location.hash.replace(/^#/, "").split("/");
+  const validFilter = filter && CATEGORIES.some((c) => c.id === filter) ? filter : null;
+  showView(view || "home", view === "guide" ? validFilter || "all" : null);
+}
+
+function navigate(view, filter) {
+  const hash = view === "home" ? "" : `#${view}${filter && filter !== "all" ? `/${filter}` : ""}`;
+  if (location.hash === hash || (!hash && !location.hash)) {
+    routeFromHash();
+  } else if (hash) {
+    location.hash = hash;
+  } else {
+    history.pushState(null, "", location.pathname + location.search);
+    routeFromHash();
+  }
 }
 
 function renderFilters() {
@@ -211,32 +317,41 @@ function renderFilters() {
     const chip = document.createElement("button");
     chip.className = `chip${i === 0 ? " is-active" : ""}`;
     chip.dataset.filter = cat.id;
+    chip.setAttribute("aria-pressed", String(i === 0));
     chip.textContent = cat.label;
     filters.appendChild(chip);
   });
 }
 
+// Shows a detail row only once it has a real value; otherwise removes it or
+// falls back to `pending` text so guests never see a half-written field.
+function setDetail(rowId, ddId, value, pending) {
+  if (!isUnset(value)) {
+    document.getElementById(ddId).textContent = value;
+  } else if (pending) {
+    const dd = document.getElementById(ddId);
+    dd.textContent = pending;
+    dd.classList.add("is-pending");
+  } else {
+    document.getElementById(rowId).remove();
+  }
+}
+
 function initWeddingCard() {
+  document.getElementById("hero-title").textContent = WEDDING.couple;
   document.getElementById("hero-date").textContent = WEDDING.date;
   document.getElementById("venue-name").textContent = WEDDING.venueName;
   document.getElementById("venue-address").textContent = WEDDING.venueAddress;
   document.getElementById("venue-maps-link").href = mapsHref(WEDDING.venueQuery || WEDDING.venueAddress);
-  document.getElementById("ceremony-time").textContent = WEDDING.ceremonyTime;
-  document.getElementById("reception-time").textContent = WEDDING.receptionTime;
 
-  if (WEDDING.dressCode) {
-    document.getElementById("dress-code").textContent = WEDDING.dressCode;
-  } else {
-    document.getElementById("dress-row").remove();
-  }
+  setDetail("ceremony-row", "ceremony-time", WEDDING.ceremonyTime, "Time coming soon");
+  setDetail("reception-row", "reception-time", WEDDING.receptionTime, "Time coming soon");
+  setDetail("dress-row", "dress-code", WEDDING.dressCode);
+  setDetail("hotel-row", "hotel-block", WEDDING.hotelBlock);
 
-  if (WEDDING.hotelBlock) {
-    document.getElementById("hotel-block").textContent = WEDDING.hotelBlock;
-  } else {
-    document.getElementById("hotel-row").remove();
-  }
-
-  document.getElementById("wedding-notes").textContent = WEDDING.notes || "";
+  const notes = document.getElementById("wedding-notes");
+  if (isUnset(WEDDING.notes)) notes.remove();
+  else notes.textContent = WEDDING.notes;
 }
 
 function initRehearsalCard() {
@@ -252,8 +367,11 @@ function initRehearsalCard() {
   document.getElementById("rehearsal-maps-link").href = mapsHref(
     REHEARSAL.venueQuery || REHEARSAL.venueName
   );
-  document.getElementById("rehearsal-time").textContent = REHEARSAL.time || "Time TBD";
-  document.getElementById("rehearsal-notes").textContent = REHEARSAL.notes || "";
+  setDetail("rehearsal-time-row", "rehearsal-time", REHEARSAL.time, "Time coming soon");
+
+  const notes = document.getElementById("rehearsal-notes");
+  if (isUnset(REHEARSAL.notes)) notes.remove();
+  else notes.textContent = REHEARSAL.notes;
 
   card.hidden = false;
 }
@@ -262,6 +380,7 @@ function init() {
   initWeddingCard();
   initRehearsalCard();
 
+  document.getElementById("contact-heading").textContent = `Ask ${CONTACT.name}`;
   document.getElementById("contact-blurb").textContent = CONTACT.blurb;
   const emailLink = document.getElementById("contact-email");
   emailLink.href = `mailto:${CONTACT.email}`;
@@ -277,18 +396,20 @@ function init() {
   }
 
   renderFilters();
+  renderHomeSections();
 
   document.querySelectorAll(".tab").forEach((tab) => {
-    tab.addEventListener("click", () => showView(tab.dataset.view));
+    tab.addEventListener("click", () => navigate(tab.dataset.view));
   });
 
   document.getElementById("filters").addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
     if (!chip) return;
-    document.querySelectorAll(".chip").forEach((c) => c.classList.remove("is-active"));
-    chip.classList.add("is-active");
-    renderGuide(chip.dataset.filter);
+    navigate("guide", chip.dataset.filter);
   });
+
+  window.addEventListener("hashchange", routeFromHash);
+  window.addEventListener("popstate", routeFromHash);
 
   document.getElementById("views").addEventListener("click", (e) => {
     const btn = e.target.closest(".save-btn");
@@ -306,7 +427,8 @@ function init() {
   });
 
   renderSyncState();
-  renderGuide("all");
+  updateSavedCount(getSaved().size);
+  routeFromHash();
 }
 
 document.addEventListener("DOMContentLoaded", init);

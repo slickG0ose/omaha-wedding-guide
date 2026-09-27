@@ -26,15 +26,43 @@ test("the rehearsal dinner card renders with a working directions link", async (
 test("guide renders every category section", async ({ page }) => {
   await page.getByRole("button", { name: "Guide" }).click();
   const headings = page.locator(".group-heading");
-  await expect(headings).toHaveCount(4);
+  await expect(headings).toHaveCount(3);
   await expect(page.locator(".place-card").first()).toBeVisible();
 });
 
 test("filtering narrows the guide to one section", async ({ page }) => {
   await page.getByRole("button", { name: "Guide" }).click();
-  await page.locator(".chip", { hasText: "Outdoors" }).click();
+  await page.locator(".chip", { hasText: "Entertainment" }).click();
   await expect(page.locator(".group-heading")).toHaveCount(1);
-  await expect(page.locator(".group-heading")).toContainText("Outdoors");
+  await expect(page.locator(".group-heading")).toContainText("Entertainment");
+  await expect(page).toHaveURL(/#guide\/fun$/);
+});
+
+test("unfinished details never show a TODO to guests", async ({ page }) => {
+  await expect(page.locator("#view-home")).not.toContainText("TODO");
+  await page.getByRole("button", { name: "Guide" }).click();
+  await expect(page.locator("#view-guide")).not.toContainText("TODO");
+});
+
+test("a shared #guide/eat link opens straight to Food & Drink", async ({ page }) => {
+  await page.goto("/#guide/eat");
+  await expect(page.locator("#view-guide")).toBeVisible();
+  await expect(page.locator(".chip.is-active")).toHaveText("Food & Drink");
+  await expect(page.locator(".group-heading")).toHaveCount(1);
+});
+
+test("home section tiles lead into the guide, and back returns home", async ({ page }) => {
+  await page.locator(".section-tile").first().click();
+  await expect(page.locator("#view-guide")).toBeVisible();
+  await page.goBack();
+  await expect(page.locator("#view-home")).toBeVisible();
+});
+
+test("your picks are badged and lead their group", async ({ page }) => {
+  await page.goto("/#guide/fun");
+  const pick = page.locator(".place-card.is-pick").first();
+  await expect(pick.locator(".pick-badge")).toContainText("pick");
+  await expect(pick.locator(".place-tip")).not.toBeEmpty();
 });
 
 test("saving a place persists across a reload", async ({ page }) => {
