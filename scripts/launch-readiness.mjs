@@ -21,6 +21,7 @@ const findings = [];
 for (const [key, value] of Object.entries(WEDDING)) {
   if (isTodo(value)) findings.push(`WEDDING.${key} — ${value}`);
 }
+if (!WEDDING.playlistUrl) findings.push("WEDDING.playlistUrl — empty, so the playlist button is hidden");
 for (const [key, value] of Object.entries(CONTACT)) {
   if (isTodo(value)) findings.push(`CONTACT.${key} — ${value}`);
 }

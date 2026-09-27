@@ -264,6 +264,19 @@ main {
 .btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 .btn:active { transform: scale(0.97); }
 
+.btn[hidden] { display: none; }
+
+.btn-icon {
+  width: 17px;
+  height: 17px;
+  margin-right: 7px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .btn-secondary {
   background: var(--chip-bg);
   color: var(--ink);
@@ -275,7 +288,7 @@ main {
 .btn-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  column-gap: 10px;
   align-items: center;
 }
 

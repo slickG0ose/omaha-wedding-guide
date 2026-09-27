@@ -349,6 +349,14 @@ function initWeddingCard() {
   setDetail("dress-row", "dress-code", WEDDING.dressCode);
   setDetail("hotel-row", "hotel-block", WEDDING.hotelBlock);
 
+  // Only an https link renders — a typo'd or placeholder value just hides the
+  // button rather than sending guests somewhere broken.
+  const playlist = document.getElementById("playlist-link");
+  if (/^https:\/\/\S+$/.test(WEDDING.playlistUrl || "")) {
+    playlist.href = WEDDING.playlistUrl;
+    playlist.hidden = false;
+  }
+
   const notes = document.getElementById("wedding-notes");
   if (isUnset(WEDDING.notes)) notes.remove();
   else notes.textContent = WEDDING.notes;

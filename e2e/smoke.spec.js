@@ -12,6 +12,17 @@ test("home shows the wedding details", async ({ page }) => {
   await expect(page.locator("#venue-maps-link")).toHaveAttribute("href", /maps\.(google|apple)\.com/);
 });
 
+test("the playlist button only shows for a real https link", async ({ page }) => {
+  const url = await page.evaluate(() => WEDDING.playlistUrl);
+  const link = page.locator("#playlist-link");
+  if (/^https:\/\/\S+$/.test(url || "")) {
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", url);
+  } else {
+    await expect(link).toBeHidden();
+  }
+});
+
 test("the rehearsal dinner card renders with a working directions link", async ({ page }) => {
   const card = page.locator("#rehearsal-card");
   await expect(card).toBeVisible();

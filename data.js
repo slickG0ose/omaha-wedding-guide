@@ -24,10 +24,13 @@ const WEDDING = {
   venueName: "Russ & Jean's",
   venueAddress: "2006 Jennings Ave, Council Bluffs, IA 51503",
   venueQuery: "2006 Jennings Ave Council Bluffs IA 51503",
-  ceremonyTime: "TODO: e.g. 4:00 PM",
-  receptionTime: "TODO: e.g. 6:00 PM",
+  ceremonyTime: "4:30 PM",
+  receptionTime: "Following the ceremony",
   hotelBlock: "TODO: hotel name + booking link/code, or delete this line",
-  dressCode: "TODO: optional",
+  dressCode: "Semi-formal",
+  // Reception playlist — a Spotify / Apple Music / YouTube link. Leave empty
+  // and the button doesn't show. Must start with https://.
+  playlistUrl: "https://open.spotify.com/playlist/0xhs4DiM4w87j6lkz5v8F5",
   notes: "TODO: any other must-know logistics (parking, shuttle, weather backup, etc.)"
 };
 
@@ -41,6 +44,9 @@ const REHEARSAL = {
   venueName: "Upstream Brewing Company",
   venueArea: "Old Market, downtown Omaha",
   venueQuery: "Upstream Brewing Company Old Market Omaha",
+  // Reception playlist — a Spotify / Apple Music / YouTube link. Leave empty
+  // and the button doesn't show. Must start with https://.
+  playlistUrl: "https://open.spotify.com/playlist/0xhs4DiM4w87j6lkz5v8F5",
   notes: "TODO: who's invited, and anything else people need to know"
 };
 
