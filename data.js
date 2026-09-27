@@ -40,7 +40,7 @@ const WEDDING = {
 const REHEARSAL = {
   title: "Rehearsal Dinner",
   date: "Friday, October 2, 2026",
-  time: "",
+  time: "6:30 PM",
   venueName: "Upstream Brewing Company",
   venueArea: "Old Market, downtown Omaha",
   venueQuery: "Upstream Brewing Company Old Market Omaha",
@@ -62,12 +62,15 @@ const CATEGORIES = [
     id: "eat",
     label: "Food & Drink",
     heading: "Food & Drink",
-    intro: "Where to eat and drink, from first coffee to last call.",
+    intro: "Where to eat, from first coffee to a proper dinner.",
     groups: [
-      { id: "breakfast", label: "Coffee & Breakfast" },
+      { id: "coffee", label: "Coffee" },
+      { id: "breakfast", label: "Breakfast & Bakeries" },
       { id: "casual", label: "Lunch & Casual" },
-      { id: "dinner", label: "Dinner" },
-      { id: "drinks", label: "Bars & Breweries" }
+      { id: "sweets", label: "Ice Cream & Treats" },
+      { id: "classic-dinner", label: "Omaha Institutions" },
+      { id: "sushi", label: "Sushi" },
+      { id: "global", label: "Around the World" }
     ]
   },
   {
@@ -78,16 +81,18 @@ const CATEGORIES = [
     groups: [
       { id: "classics", label: "Omaha Classics" },
       { id: "museums", label: "Museums & Rainy-Day" },
-      { id: "outdoors", label: "Outdoors & Overlooks" }
+      { id: "outdoors", label: "Outdoors & Overlooks" },
+      { id: "shops", label: "Local Shops" }
     ]
   },
   {
     id: "fun",
     label: "Entertainment",
     heading: "Entertainment",
-    intro: "Nights out — live music, shows, and neighborhoods worth wandering.",
+    intro: "Nights out — live music, bars, and neighborhoods worth wandering.",
     groups: [
       { id: "music", label: "Live Music & Shows" },
+      { id: "bars", label: "Bars" },
       { id: "neighborhoods", label: "Neighborhoods to Wander" }
     ]
   }
@@ -96,15 +101,16 @@ const CATEGORIES = [
 const PLACES = [
   // =====================================================================
   // FOOD & DRINK
-  // STARTER LIST — well-known metro spots, not yet your personal picks. Cut
-  // what you wouldn't send people to, mark your favorites with pick: true,
-  // and confirm they're still open before the weekend.
+  // Confirm hours before the weekend — several of these close early or
+  // skip days. Mark your favorites with pick: true and add a `tip` in your
+  // own words.
   //
   // Copy this block to add one:
   // {
-  //   id: "place-name",
+  //   id: "place-name",           // lowercase-hyphenated, no apostrophes
   //   category: "eat",
-  //   group: "dinner",          // breakfast | casual | dinner | drinks
+  //   group: "sushi",             // coffee | breakfast | casual | sweets |
+  //                               // classic-dinner | sushi | global (Around the World)
   //   name: "Place Name",
   //   blurb: "One or two sentences on why it's worth the trip.",
   //   tip: "Get the ___. Go before 6 or expect a wait.",
@@ -114,24 +120,54 @@ const PLACES = [
   // },
   // =====================================================================
 
-  // ---- Coffee & Breakfast ----
+  // ---- Coffee ----
   {
     id: "archetype-coffee",
     category: "eat",
-    group: "breakfast",
+    group: "coffee",
     name: "Archetype Coffee",
     blurb: "The local coffee benchmark. Blackstone and Little Bohemia are both easy stops.",
-    tag: "Coffee",
     query: "Archetype Coffee Omaha"
   },
   {
-    id: "early-bird",
+    id: "blue-line-coffee",
+    category: "eat",
+    group: "coffee",
+    name: "Blue Line Coffee",
+    blurb: "Cozy, mismatched-chairs neighborhood shop in Dundee. Strong cappuccinos, and the blueberry scones are the move.",
+    pick: true,
+    query: "Blue Line Coffee 4924 Underwood Ave Omaha"
+  },
+  {
+    id: "zen-coffee",
+    category: "eat",
+    group: "coffee",
+    name: "Zen Coffee Company",
+    blurb: "Bright, woman-owned shop on Farnam just west of downtown, with pastries baked in-house. Order the tasting flight to try four drinks at once.",
+    pick: true,
+    query: "Zen Coffee Company 2504 Farnam St Omaha"
+  },
+
+  // ---- Breakfast & Bakeries ----
+  {
+    id: "baileys",
     category: "eat",
     group: "breakfast",
-    name: "Early Bird Brunch",
-    blurb: "Straightforward, well-executed brunch with a few locations around the metro.",
-    tag: "Brunch",
-    query: "Early Bird Brunch Omaha"
+    name: "Bailey's Breakfast & Lunch",
+    blurb: "Locals' all-day breakfast spot in west Omaha with meats smoked in-house. First come, first served, and closes at 2 PM.",
+    tag: "Breakfast",
+    pick: true,
+    query: "Bailey's Breakfast & Lunch 1259 S 120th St Omaha"
+  },
+  {
+    id: "olsen-bake-shop",
+    category: "eat",
+    group: "breakfast",
+    name: "Olsen Bake Shop",
+    blurb: "Family-run South Omaha bakery going since 1942 — kolaches, donuts, and strudel from the case. Grab a box on your way somewhere.",
+    tag: "Bakery",
+    pick: true,
+    query: "Olsen Bake Shop 1708 S 10th St Omaha"
   },
 
   // ---- Lunch & Casual ----
@@ -145,37 +181,122 @@ const PLACES = [
     query: "Block 16 Omaha"
   },
 
-  // ---- Dinner ----
+  // ---- Ice Cream & Treats ----
   {
-    id: "gorats",
+    id: "coneflower-creamery",
     category: "eat",
-    group: "dinner",
-    name: "Gorat's Steak House",
-    blurb: "Old-school Omaha steakhouse that hasn't changed in decades. Call ahead — it fills up.",
-    tag: "Steak",
-    query: "Gorat's Steak House Omaha"
+    group: "sweets",
+    name: "Coneflower Creamery",
+    blurb: "Small-batch ice cream in Blackstone made with Nebraska dairy. Get the Blackstone Butter Brickle — a nod to the butter brickle invented at the old Blackstone Hotel.",
+    tag: "Ice cream",
+    pick: true,
+    query: "Coneflower Creamery Omaha"
   },
+
+  // ---- Omaha Institutions ----
   {
     id: "the-drover",
     category: "eat",
-    group: "dinner",
+    group: "classic-dinner",
     name: "The Drover",
-    blurb: "Whiskey-marinated steak in a dark, cozy room. The other answer to \"where do I get an Omaha steak?\"",
+    blurb: "Whiskey-marinated steak in a dark, cozy room. The answer to \"where do I get an Omaha steak?\"",
     tag: "Steak",
     query: "The Drover Omaha"
   },
   {
-    id: "le-bouillon",
+    id: "ms-pub",
     category: "eat",
-    group: "dinner",
-    name: "Le Bouillon",
-    blurb: "French bistro tucked into an Old Market basement. Good call for a nicer dinner out.",
-    tag: "French",
-    query: "Le Bouillon Omaha"
+    group: "classic-dinner",
+    name: "M's Pub",
+    blurb: "Old Market fixture since 1972. Order the lahvosh (Armenian cracker bread piled with toppings) to share. Reservations recommended.",
+    tag: "Old Market",
+    pick: true,
+    query: "M's Pub 422 S 11th St Omaha"
   },
 
-  // ---- Bars & Breweries ----
-  // Empty on purpose — add your go-to bars here (group: "drinks").
+  // ---- Sushi ----
+  {
+    id: "yoshitomo",
+    category: "eat",
+    group: "sushi",
+    name: "Yoshitomo",
+    blurb: "Intimate Benson sushi bar with inventive, playful nigiri and small plates. A James Beard semifinalist — book ahead.",
+    tag: "Benson",
+    pick: true,
+    query: "Yoshitomo 6011 Maple St Omaha"
+  },
+  {
+    id: "blue-sushi",
+    category: "eat",
+    group: "sushi",
+    name: "Blue Sushi Sake Grill",
+    blurb: "Lively, multi-level Old Market spot with a long roll list, good vegan options, and a big sake menu. Easy for a group.",
+    tag: "Old Market",
+    pick: true,
+    query: "Blue Sushi Sake Grill 416 S 12th St Omaha"
+  },
+  {
+    id: "hiro-88",
+    category: "eat",
+    group: "sushi",
+    name: "Hiro 88",
+    blurb: "Local sushi and pan-Asian mini-chain. The Old Market location on Jackson St is the one to hit if you're downtown.",
+    tag: "Old Market",
+    pick: true,
+    query: "Hiro 88 1308 Jackson St Omaha"
+  },
+
+  // ---- Around the World ----
+  {
+    id: "kinaara",
+    category: "eat",
+    group: "global",
+    name: "Kinaara",
+    blurb: "Chef-owned Indian at Regency, rooted in Kerala. South Indian specialties and biryani, with plenty of vegan and gluten-free options.",
+    tag: "Indian",
+    pick: true,
+    query: "Kinaara 120 Regency Pkwy Omaha"
+  },
+  {
+    id: "star-indian-cuisine",
+    category: "eat",
+    group: "global",
+    name: "Star Indian Cuisine",
+    blurb: "Small, family-run west Omaha spot with a big following and warm owners. Dinner-focused — check hours before you go.",
+    tag: "Indian",
+    pick: true,
+    query: "Star Indian Cuisine 2429 S 132nd St Omaha"
+  },
+  {
+    id: "santoro",
+    category: "eat",
+    group: "global",
+    name: "Santoro",
+    blurb: "Puebla-inspired Mexican from chef Jesús Rivera — mole enchiladas and cochinita pibil. Dinner only, Tuesday–Saturday, no reservations.",
+    tag: "Mexican",
+    pick: true,
+    query: "Santoro 8601 W Dodge Rd Omaha"
+  },
+  {
+    id: "lalibela",
+    category: "eat",
+    group: "global",
+    name: "Lalibela Ethiopian Restaurant",
+    blurb: "Midtown Ethiopian since 2010. Stews, meats, and vegetables served on injera you tear and scoop with — platters feed a crowd, so come hungry or bring friends. Closed Mondays.",
+    tag: "Ethiopian",
+    pick: true,
+    query: "Lalibela Ethiopian Restaurant 4422 Cass St Omaha"
+  },
+  {
+    id: "salween-thai",
+    category: "eat",
+    group: "global",
+    name: "Salween Thai",
+    blurb: "Longtime Saddle Creek Thai spot. Spice runs on a 1–10 scale, not 1–5 — order accordingly. Pad see ew and cashew chicken are the regulars' picks.",
+    tag: "Thai",
+    pick: true,
+    query: "Salween Thai 1102 NW Radial Hwy Omaha"
+  },
 
   // =====================================================================
   // THINGS TO DO
@@ -299,14 +420,17 @@ const PLACES = [
     tag: "Easy",
     query: "Lake Cunningham Omaha"
   },
+
+  // ---- Local Shops ----
   {
-    id: "chalco-hills",
+    id: "lidgett-music",
     category: "do",
-    group: "outdoors",
-    name: "Chalco Hills & Wehrspann Lake",
-    blurb: "Flat loop around the lake in Papillion. Good for a walk, a run, or doing very little.",
-    tag: "Easy",
-    query: "Chalco Hills Recreation Area"
+    group: "shops",
+    name: "Lidgett Music",
+    blurb: "One of the best high-end guitar shops in the Midwest — Gibson, PRS, Martin, Collings — on Council Bluffs' historic 100 block, close to the venue. Odd hours and closed Tuesdays, so check before you go.",
+    tag: "Council Bluffs",
+    pick: true,
+    query: "Lidgett Music Council Bluffs IA"
   },
 
   // =====================================================================
@@ -329,6 +453,28 @@ const PLACES = [
     name: "Orpheum Theater & Holland Center",
     blurb: "Touring shows, symphony, and big-room performances downtown. Worth checking the calendar for that weekend.",
     query: "Orpheum Theater Omaha"
+  },
+
+  // ---- Bars ----
+  {
+    id: "shakedown-street-tavern",
+    category: "fun",
+    group: "bars",
+    name: "Shakedown Street Tavern",
+    blurb: "Grateful Dead–themed bar in the middle of the Benson strip, with local live music. Monday is Omaha's longest-running open mic.",
+    tag: "Benson",
+    pick: true,
+    query: "Shakedown Street Tavern 2735 N 62nd St Omaha"
+  },
+  {
+    id: "brokedown-palace",
+    category: "fun",
+    group: "bars",
+    name: "Brokedown Palace",
+    blurb: "Shakedown's sister bar out west at 88th & Maple — Deadheads, Husker games, live bands on the patio, and a dog-friendly crowd.",
+    tag: "Live music",
+    pick: true,
+    query: "Brokedown Palace 8805 Maple St Omaha"
   },
 
   // ---- Neighborhoods to Wander ----

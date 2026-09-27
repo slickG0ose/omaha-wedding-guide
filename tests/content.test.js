@@ -55,6 +55,14 @@ describe("places", () => {
     }
   });
 
+  test("place ids are lowercase-hyphenated", () => {
+    // Ids are storage keys for saved lists and trip codes — an apostrophe or
+    // capital letter is an easy typo that makes a save silently fail to match.
+    for (const place of PLACES) {
+      assert.match(place.id, /^[a-z0-9]+(-[a-z0-9]+)*$/, `place id "${place.id}" must be lowercase-hyphenated`);
+    }
+  });
+
   test("place ids are unique", () => {
     const ids = PLACES.map((p) => p.id);
     const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);

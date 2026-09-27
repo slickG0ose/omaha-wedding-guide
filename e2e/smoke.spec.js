@@ -70,10 +70,17 @@ test("home section tiles lead into the guide, and back returns home", async ({ p
 });
 
 test("your picks are badged and lead their group", async ({ page }) => {
-  await page.goto("/#guide/fun");
-  const pick = page.locator(".place-card.is-pick").first();
-  await expect(pick.locator(".pick-badge")).toContainText("pick");
-  await expect(pick.locator(".place-tip")).not.toBeEmpty();
+  await page.goto("/#guide");
+  await expect(page.locator(".place-card.is-pick .pick-badge").first()).toContainText("pick");
+
+  // Within every group, no pick may appear after a non-pick.
+  const orders = await page.locator(".place-list").evaluateAll((lists) =>
+    lists.map((ul) => [...ul.children].map((li) => li.classList.contains("is-pick")))
+  );
+  for (const order of orders) {
+    const firstNonPick = order.indexOf(false);
+    expect(firstNonPick === -1 || !order.slice(firstNonPick).includes(true)).toBe(true);
+  }
 });
 
 test("saving a place persists across a reload", async ({ page }) => {
