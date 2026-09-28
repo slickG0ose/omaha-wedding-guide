@@ -58,7 +58,7 @@ npm run test:all && npm run check:ready
 lists unfinished wedding details, empty groups, and how many picks you've
 marked per section — it's a report, not a gate.
 
-Links can point at a section directly: `…/omaha-wedding-guide/#guide/eat`,
+Links can point at a section directly: `…/anna-and-charlie/#guide/eat`,
 `#guide/do`, `#guide/fun`, `#saved`, `#contact`. Add `/by-area` for the
 neighborhood view: `#guide/all/by-area`, `#guide/eat/by-area`.
 

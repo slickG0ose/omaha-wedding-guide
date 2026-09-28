@@ -10,7 +10,7 @@ entry|index.html (loads data.js then app.js as plain scripts)
 dev|npm run dev (python3 file server on :4173)
 test|npm test (content integrity) · npm run test:e2e (Playwright smoke) · npm run test:all
 deploy|Push to main → .github/workflows/ci.yml → GitHub Pages. Tests gate the deploy.
-live|https://slickg0ose.github.io/omaha-wedding-guide/
+live|https://slickg0ose.github.io/anna-and-charlie/
 
 ## Structure
 index.html|Markup and the four view containers|{view-home,view-guide,view-saved,view-contact}
