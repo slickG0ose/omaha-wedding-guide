@@ -10,10 +10,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 // load it with a <script> tag. Evaluate it the same way the page does.
 function loadData() {
   const src = readFileSync(join(root, "data.js"), "utf8");
-  return new Function(`${src}; return { WEDDING, CONTACT, REHEARSAL, CATEGORIES, PLACES };`)();
+  return new Function(`${src}; return { WEDDING, CONTACT, REHEARSAL, CATEGORIES, AREAS, PLACES };`)();
 }
 
-const { WEDDING, CONTACT, REHEARSAL, CATEGORIES, PLACES } = loadData();
+const { WEDDING, CONTACT, REHEARSAL, CATEGORIES, AREAS, PLACES } = loadData();
 
 describe("categories", () => {
   test("every category has an id, label, heading, and at least one group", () => {
@@ -52,6 +52,15 @@ describe("places", () => {
       for (const field of ["id", "category", "group", "name", "blurb", "query"]) {
         assert.ok(place[field], `place ${place.id || "(no id)"} missing "${field}"`);
       }
+    }
+  });
+
+  // The neighborhood view only draws places whose area is in AREAS — a typo
+  // drops the place from that view with no error.
+  test("every place has a real area", () => {
+    const valid = new Set(AREAS.map((a) => a.id));
+    for (const place of PLACES) {
+      assert.ok(valid.has(place.area), `place "${place.id}" has area "${place.area}", which isn't in AREAS`);
     }
   });
 

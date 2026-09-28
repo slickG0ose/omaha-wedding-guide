@@ -26,7 +26,6 @@ const WEDDING = {
   venueQuery: "2006 Jennings Ave Council Bluffs IA 51503",
   ceremonyTime: "4:30 PM",
   receptionTime: "Following the ceremony",
-  hotelBlock: "TODO: hotel name + booking link/code, or delete this line",
   dressCode: "Semi-formal",
   // Reception playlist — a Spotify / Apple Music / YouTube link. Leave empty
   // and the button doesn't show. Must start with https://.
@@ -40,11 +39,9 @@ const WEDDING = {
 const REHEARSAL = {
   title: "Rehearsal Dinner",
   date: "Friday, October 2, 2026",
-  time: "6:30 PM",
   venueName: "Upstream Brewing Company",
   venueArea: "Old Market, downtown Omaha",
   venueQuery: "Upstream Brewing Company Old Market Omaha",
-  notes: "TODO: who's invited, and anything else people need to know"
 };
 
 // This repo is public (GitHub Pages on the free tier requires it), so anything
@@ -62,15 +59,17 @@ const CATEGORIES = [
     id: "eat",
     label: "Food & Drink",
     heading: "Food & Drink",
-    intro: "Where to eat, from first coffee to a proper dinner.",
+    intro: "Where to eat and drink, from first coffee to last call.",
     groups: [
       { id: "coffee", label: "Coffee" },
       { id: "breakfast", label: "Breakfast & Bakeries" },
       { id: "casual", label: "Lunch & Casual" },
       { id: "sweets", label: "Ice Cream & Treats" },
       { id: "classic-dinner", label: "Omaha Institutions" },
+      { id: "dinner-out", label: "Dinner Out" },
       { id: "sushi", label: "Sushi" },
-      { id: "global", label: "Around the World" }
+      { id: "global", label: "Around the World" },
+      { id: "bars", label: "Bars, Lounges & Beer Gardens" }
     ]
   },
   {
@@ -89,13 +88,25 @@ const CATEGORIES = [
     id: "fun",
     label: "Entertainment",
     heading: "Entertainment",
-    intro: "Nights out — live music, bars, and neighborhoods worth wandering.",
+    intro: "Nights out — live music, shows, and neighborhoods worth wandering.",
     groups: [
       { id: "music", label: "Live Music & Shows" },
-      { id: "bars", label: "Bars" },
       { id: "neighborhoods", label: "Neighborhoods to Wander" }
     ]
   }
+];
+
+// AREAS powers the Guide's "By neighborhood" view. Every place needs an
+// `area` matching one of these ids. Order here is the order on the page.
+const AREAS = [
+  { id: "downtown", label: "Downtown & Old Market", intro: "Walkable core by the river — park once and wander." },
+  { id: "midtown", label: "Midtown & Blackstone", intro: "Farnam and Leavenworth corridor, a short hop west of downtown." },
+  { id: "dundee", label: "Dundee", intro: "Small, leafy neighborhood strip around 50th & Underwood." },
+  { id: "benson", label: "Benson", intro: "Maple Street bars, music, and food — Omaha's night-out strip." },
+  { id: "south", label: "South Omaha & the Zoo", intro: "The zoo, the gardens, and old-school South O." },
+  { id: "west", label: "West Omaha", intro: "Spread out and suburban — you'll want a car." },
+  { id: "iowa", label: "Council Bluffs", intro: "The Iowa side, closest to the wedding venue." },
+  { id: "farther", label: "Farther Afield", intro: "Worth a 20–30 minute drive." }
 ];
 
 const PLACES = [
@@ -110,7 +121,9 @@ const PLACES = [
   //   id: "place-name",           // lowercase-hyphenated, no apostrophes
   //   category: "eat",
   //   group: "sushi",             // coffee | breakfast | casual | sweets |
-  //                               // classic-dinner | sushi | global (Around the World)
+  //                               // classic-dinner | dinner-out | sushi |
+  //                               // global (Around the World) | bars
+  //   area: "downtown",           // see AREAS above
   //   name: "Place Name",
   //   blurb: "One or two sentences on why it's worth the trip.",
   //   tip: "Get the ___. Go before 6 or expect a wait.",
@@ -125,6 +138,7 @@ const PLACES = [
     id: "archetype-coffee",
     category: "eat",
     group: "coffee",
+    area: "midtown",
     name: "Archetype Coffee",
     blurb: "The local coffee benchmark. Blackstone and Little Bohemia are both easy stops.",
     query: "Archetype Coffee Omaha"
@@ -133,18 +147,20 @@ const PLACES = [
     id: "blue-line-coffee",
     category: "eat",
     group: "coffee",
+    area: "dundee",
     name: "Blue Line Coffee",
     blurb: "Cozy, mismatched-chairs neighborhood shop in Dundee. Strong cappuccinos, and the blueberry scones are the move.",
-    pick: true,
+    pick: false,
     query: "Blue Line Coffee 4924 Underwood Ave Omaha"
   },
   {
     id: "zen-coffee",
     category: "eat",
     group: "coffee",
+    area: "midtown",
     name: "Zen Coffee Company",
     blurb: "Bright, woman-owned shop on Farnam just west of downtown, with pastries baked in-house. Order the tasting flight to try four drinks at once.",
-    pick: true,
+    pick: false,
     query: "Zen Coffee Company 2504 Farnam St Omaha"
   },
 
@@ -153,6 +169,7 @@ const PLACES = [
     id: "baileys",
     category: "eat",
     group: "breakfast",
+    area: "west",
     name: "Bailey's Breakfast & Lunch",
     blurb: "Locals' all-day breakfast spot in west Omaha with meats smoked in-house. First come, first served, and closes at 2 PM.",
     tag: "Breakfast",
@@ -163,6 +180,7 @@ const PLACES = [
     id: "olsen-bake-shop",
     category: "eat",
     group: "breakfast",
+    area: "south",
     name: "Olsen Bake Shop",
     blurb: "Family-run South Omaha bakery going since 1942 — kolaches, donuts, and strudel from the case. Grab a box on your way somewhere.",
     tag: "Bakery",
@@ -175,6 +193,7 @@ const PLACES = [
     id: "block-16",
     category: "eat",
     group: "casual",
+    area: "downtown",
     name: "Block 16",
     blurb: "Downtown counter-service sandwiches with a cult following. Expect a line at lunch.",
     tag: "Sandwiches",
@@ -186,6 +205,7 @@ const PLACES = [
     id: "coneflower-creamery",
     category: "eat",
     group: "sweets",
+    area: "midtown",
     name: "Coneflower Creamery",
     blurb: "Small-batch ice cream in Blackstone made with Nebraska dairy. Get the Blackstone Butter Brickle — a nod to the butter brickle invented at the old Blackstone Hotel.",
     tag: "Ice cream",
@@ -198,20 +218,46 @@ const PLACES = [
     id: "the-drover",
     category: "eat",
     group: "classic-dinner",
+    area: "west",
     name: "The Drover",
     blurb: "Whiskey-marinated steak in a dark, cozy room. The answer to \"where do I get an Omaha steak?\"",
     tag: "Steak",
+    pick: false,
     query: "The Drover Omaha"
   },
   {
     id: "ms-pub",
     category: "eat",
     group: "classic-dinner",
+    area: "downtown",
     name: "M's Pub",
     blurb: "Old Market fixture since 1972. Order the lahvosh (Armenian cracker bread piled with toppings) to share. Reservations recommended.",
-    tag: "Old Market",
-    pick: true,
+    pick: false,
     query: "M's Pub 422 S 11th St Omaha"
+  },
+
+  // ---- Dinner Out ----
+  {
+    id: "clio",
+    category: "eat",
+    group: "dinner-out",
+    area: "downtown",
+    name: "Clio",
+    blurb: "Flagship's Mediterranean spot at 12th & Howard — mezze, spreads, and big shareable plates, with a serious European wine list. Plenty for vegetarians. Book ahead.",
+    tag: "Mediterranean",
+    pick: true,
+    query: "Clio 1202 Howard St Omaha"
+  },
+  {
+    id: "anthem",
+    category: "eat",
+    group: "dinner-out",
+    area: "downtown",
+    name: "Anthem",
+    blurb: "Across the street from Clio in the Old Market. Fun, high-energy room doing Tex-Asian comfort food — smash burgers, wonton tuna tacos, noodles — plus weekend brunch and a patio.",
+    tag: "Tex-Asian",
+    pick: true,
+    query: "Anthem 1205 Howard St Omaha"
   },
 
   // ---- Sushi ----
@@ -219,9 +265,9 @@ const PLACES = [
     id: "yoshitomo",
     category: "eat",
     group: "sushi",
+    area: "benson",
     name: "Yoshitomo",
     blurb: "Intimate Benson sushi bar with inventive, playful nigiri and small plates. A James Beard semifinalist — book ahead.",
-    tag: "Benson",
     pick: true,
     query: "Yoshitomo 6011 Maple St Omaha"
   },
@@ -229,19 +275,19 @@ const PLACES = [
     id: "blue-sushi",
     category: "eat",
     group: "sushi",
+    area: "downtown",
     name: "Blue Sushi Sake Grill",
     blurb: "Lively, multi-level Old Market spot with a long roll list, good vegan options, and a big sake menu. Easy for a group.",
-    tag: "Old Market",
-    pick: true,
+    pick: false,
     query: "Blue Sushi Sake Grill 416 S 12th St Omaha"
   },
   {
     id: "hiro-88",
     category: "eat",
     group: "sushi",
+    area: "downtown",
     name: "Hiro 88",
     blurb: "Local sushi and pan-Asian mini-chain. The Old Market location on Jackson St is the one to hit if you're downtown.",
-    tag: "Old Market",
     pick: true,
     query: "Hiro 88 1308 Jackson St Omaha"
   },
@@ -251,6 +297,7 @@ const PLACES = [
     id: "kinaara",
     category: "eat",
     group: "global",
+    area: "west",
     name: "Kinaara",
     blurb: "Chef-owned Indian at Regency, rooted in Kerala. South Indian specialties and biryani, with plenty of vegan and gluten-free options.",
     tag: "Indian",
@@ -261,6 +308,7 @@ const PLACES = [
     id: "star-indian-cuisine",
     category: "eat",
     group: "global",
+    area: "west",
     name: "Star Indian Cuisine",
     blurb: "Small, family-run west Omaha spot with a big following and warm owners. Dinner-focused — check hours before you go.",
     tag: "Indian",
@@ -271,6 +319,7 @@ const PLACES = [
     id: "santoro",
     category: "eat",
     group: "global",
+    area: "west",
     name: "Santoro",
     blurb: "Puebla-inspired Mexican from chef Jesús Rivera — mole enchiladas and cochinita pibil. Dinner only, Tuesday–Saturday, no reservations.",
     tag: "Mexican",
@@ -281,6 +330,7 @@ const PLACES = [
     id: "lalibela",
     category: "eat",
     group: "global",
+    area: "midtown",
     name: "Lalibela Ethiopian Restaurant",
     blurb: "Midtown Ethiopian since 2010. Stews, meats, and vegetables served on injera you tear and scoop with — platters feed a crowd, so come hungry or bring friends. Closed Mondays.",
     tag: "Ethiopian",
@@ -291,11 +341,80 @@ const PLACES = [
     id: "salween-thai",
     category: "eat",
     group: "global",
+    area: "midtown",
     name: "Salween Thai",
     blurb: "Longtime Saddle Creek Thai spot. Spice runs on a 1–10 scale, not 1–5 — order accordingly. Pad see ew and cashew chicken are the regulars' picks.",
     tag: "Thai",
-    pick: true,
+    pick: false,
     query: "Salween Thai 1102 NW Radial Hwy Omaha"
+  },
+  {
+    id: "el-basha",
+    category: "eat",
+    group: "global",
+    area: "west",
+    name: "El Basha",
+    blurb: "Family-run Lebanese grill on Pacific St — hummus, falafel, shawarma, and some of the best gyros in town. Hungry? Get the mixed grill. Closed Sundays.",
+    tag: "Lebanese",
+    pick: true,
+    query: "El Basha 7503 Pacific St Omaha"
+  },
+
+  // ---- Bars, Lounges & Beer Gardens ----
+  {
+    id: "red-lion-lounge",
+    category: "eat",
+    group: "bars",
+    area: "midtown",
+    name: "Red Lion Lounge",
+    blurb: "Revived 1950s jazz lounge in Blackstone — red velvet booths, classic cocktails, live jazz most nights, and a gold 1965 phone booth for photos.",
+    tag: "Cocktails",
+    pick: true,
+    query: "Red Lion Lounge 3802 Farnam St Omaha"
+  },
+  {
+    id: "barchen",
+    category: "eat",
+    group: "bars",
+    area: "benson",
+    name: "Bärchen Beer Garden",
+    blurb: "German-style beer hall and big outdoor garden in Benson. 30 European drafts (order a boot), house-made sausages, schnitzel, and giant Bavarian pretzels.",
+    tag: "Beer garden",
+    pick: true,
+    query: "Barchen Beer Garden 6209 Maple St Omaha"
+  },
+  {
+    id: "set-the-bar",
+    category: "eat",
+    group: "bars",
+    area: "benson",
+    name: "SET the Bar",
+    blurb: "Nebraska's first women's sports bar, at 62nd & Maple — a wall of screens with the games on audio. Everyone's welcome; the women's games just get the big screen.",
+    tag: "Sports bar",
+    pick: true,
+    query: "SET the Bar Benson Omaha"
+  },
+  {
+    id: "shakedown-street-tavern",
+    category: "eat",
+    group: "bars",
+    area: "benson",
+    name: "Shakedown Street Tavern",
+    blurb: "Grateful Dead–themed bar in the middle of the Benson strip, with local live music. Monday is Omaha's longest-running open mic.",
+    tag: "Live music",
+    pick: true,
+    query: "Shakedown Street Tavern 2735 N 62nd St Omaha"
+  },
+  {
+    id: "brokedown-palace",
+    category: "eat",
+    group: "bars",
+    area: "west",
+    name: "Brokedown Palace",
+    blurb: "Shakedown's sister bar out west at 88th & Maple — Deadheads, Husker games, live bands on the patio, and a dog-friendly crowd.",
+    tag: "Live music",
+    pick: true,
+    query: "Brokedown Palace 8805 Maple St Omaha"
   },
 
   // =====================================================================
@@ -307,6 +426,7 @@ const PLACES = [
     id: "old-market",
     category: "do",
     group: "classics",
+    area: "downtown",
     name: "Old Market",
     blurb: "Cobblestone streets, local shops, restaurants, and bars downtown. The easiest home base for wandering.",
     query: "Old Market Omaha"
@@ -315,6 +435,7 @@ const PLACES = [
     id: "henry-doorly-zoo",
     category: "do",
     group: "classics",
+    area: "south",
     name: "Henry Doorly Zoo & Aquarium",
     blurb: "Routinely ranked among the best zoos in the country. Budget a half day — it's bigger than people expect.",
     tag: "Half day",
@@ -324,6 +445,7 @@ const PLACES = [
     id: "gene-leahy-mall",
     category: "do",
     group: "classics",
+    area: "downtown",
     name: "Gene Leahy Mall & The RiverFront",
     blurb: "Rebuilt downtown park chain — lawns, sculpture, a big slide, and a straight shot to the river.",
     tag: "Free",
@@ -333,6 +455,7 @@ const PLACES = [
     id: "bob-kerrey-bridge",
     category: "do",
     group: "classics",
+    area: "downtown",
     name: "Bob Kerrey Pedestrian Bridge",
     blurb: "Walk across the Missouri River and stand in two states at once. Best light in the evening.",
     tag: "Free",
@@ -342,6 +465,7 @@ const PLACES = [
     id: "lauritzen-gardens",
     category: "do",
     group: "classics",
+    area: "south",
     name: "Lauritzen Gardens",
     blurb: "Botanical garden on the bluffs above the river. Calm, pretty, and an easy walk at any pace.",
     query: "Lauritzen Gardens"
@@ -352,6 +476,7 @@ const PLACES = [
     id: "joslyn-art-museum",
     category: "do",
     group: "museums",
+    area: "midtown",
     name: "Joslyn Art Museum",
     blurb: "Free general admission, and the expansion gave it a lot more to see. Good rainy-afternoon option.",
     tag: "Free",
@@ -361,6 +486,7 @@ const PLACES = [
     id: "durham-museum",
     category: "do",
     group: "museums",
+    area: "downtown",
     name: "The Durham Museum",
     blurb: "Omaha history inside a restored art deco train station. Worth it for the building alone.",
     query: "Durham Museum Omaha"
@@ -369,6 +495,7 @@ const PLACES = [
     id: "kiewit-luminarium",
     category: "do",
     group: "museums",
+    area: "downtown",
     name: "Kiewit Luminarium",
     blurb: "Hands-on science center on the riverfront. Genuinely fun for adults, not just kids.",
     query: "Kiewit Luminarium Omaha"
@@ -379,6 +506,7 @@ const PLACES = [
     id: "lewis-clark-overlook",
     category: "do",
     group: "outdoors",
+    area: "iowa",
     name: "Lewis & Clark Monument Overlook",
     blurb: "Bluff-top view over the river valley and the Omaha skyline, minutes from the venue. Drive right up and sit.",
     tag: "Easy",
@@ -388,6 +516,7 @@ const PLACES = [
     id: "fontenelle-forest",
     category: "do",
     group: "outdoors",
+    area: "farther",
     name: "Fontenelle Forest",
     blurb: "Miles of wooded trails in Bellevue, plus a flat boardwalk loop for the easy version. Early October is peak color.",
     tag: "Hike",
@@ -397,6 +526,7 @@ const PLACES = [
     id: "hitchcock-nature-center",
     category: "do",
     group: "outdoors",
+    area: "iowa",
     name: "Hitchcock Nature Center",
     blurb: "Ridgeline hiking in the Loess Hills, close to the venue on the Iowa side. October is hawk migration season.",
     tag: "Hike",
@@ -406,6 +536,7 @@ const PLACES = [
     id: "hummel-park",
     category: "do",
     group: "outdoors",
+    area: "farther",
     name: "Hummel Park",
     blurb: "Hilly, wooded, and quiet north of town. Steep ravines and the old stone steps — not a flat stroll.",
     tag: "Hike",
@@ -415,6 +546,7 @@ const PLACES = [
     id: "lake-cunningham",
     category: "do",
     group: "outdoors",
+    area: "farther",
     name: "Lake Cunningham",
     blurb: "Big open water on the north side — paved trails, boat ramps, and room to spread out.",
     tag: "Easy",
@@ -426,9 +558,10 @@ const PLACES = [
     id: "lidgett-music",
     category: "do",
     group: "shops",
+    area: "iowa",
     name: "Lidgett Music",
     blurb: "One of the best high-end guitar shops in the Midwest — Gibson, PRS, Martin, Collings — on Council Bluffs' historic 100 block, close to the venue. Odd hours and closed Tuesdays, so check before you go.",
-    tag: "Council Bluffs",
+    tag: "Guitars",
     pick: true,
     query: "Lidgett Music Council Bluffs IA"
   },
@@ -442,6 +575,7 @@ const PLACES = [
     id: "slowdown-film-streams",
     category: "fun",
     group: "music",
+    area: "downtown",
     name: "Slowdown & Film Streams",
     blurb: "Indie music venue next door to the arthouse cinema, both in North Downtown. Easy night out.",
     query: "Slowdown Omaha"
@@ -450,31 +584,10 @@ const PLACES = [
     id: "orpheum-holland",
     category: "fun",
     group: "music",
+    area: "downtown",
     name: "Orpheum Theater & Holland Center",
     blurb: "Touring shows, symphony, and big-room performances downtown. Worth checking the calendar for that weekend.",
     query: "Orpheum Theater Omaha"
-  },
-
-  // ---- Bars ----
-  {
-    id: "shakedown-street-tavern",
-    category: "fun",
-    group: "bars",
-    name: "Shakedown Street Tavern",
-    blurb: "Grateful Dead–themed bar in the middle of the Benson strip, with local live music. Monday is Omaha's longest-running open mic.",
-    tag: "Benson",
-    pick: true,
-    query: "Shakedown Street Tavern 2735 N 62nd St Omaha"
-  },
-  {
-    id: "brokedown-palace",
-    category: "fun",
-    group: "bars",
-    name: "Brokedown Palace",
-    blurb: "Shakedown's sister bar out west at 88th & Maple — Deadheads, Husker games, live bands on the patio, and a dog-friendly crowd.",
-    tag: "Live music",
-    pick: true,
-    query: "Brokedown Palace 8805 Maple St Omaha"
   },
 
   // ---- Neighborhoods to Wander ----
@@ -482,6 +595,7 @@ const PLACES = [
     id: "benson",
     category: "fun",
     group: "neighborhoods",
+    area: "benson",
     name: "Benson",
     blurb: "Dive bars, live music, and good cheap food along Maple.",
     tip: "My favorite stretch in town. Check what's on at The Waiting Room or Reverb.",
@@ -492,6 +606,7 @@ const PLACES = [
     id: "blackstone-district",
     category: "fun",
     group: "neighborhoods",
+    area: "midtown",
     name: "Blackstone District",
     blurb: "Walkable midtown strip of bars and restaurants. Compact enough to park once and wander.",
     query: "Blackstone District Omaha"
@@ -500,6 +615,7 @@ const PLACES = [
     id: "dundee",
     category: "fun",
     group: "neighborhoods",
+    area: "dundee",
     name: "Dundee",
     blurb: "Small, walkable neighborhood strip with an old-Omaha feel. Low-key dinner and a drink.",
     query: "Dundee Omaha NE"

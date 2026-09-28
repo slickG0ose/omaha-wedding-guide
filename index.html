@@ -68,6 +68,7 @@
       <h2 class="home-heading">While you're in town</h2>
       <p class="section-lede">Local recommendations, sorted. Tap the heart on anything to save it to your list.</p>
       <nav id="home-sections" class="section-tiles" aria-label="Guide sections"></nav>
+      <a class="area-link" href="#guide/all/by-area">Or browse everything by neighborhood →</a>
     </section>
 
     <section id="view-guide" class="view" hidden>
@@ -75,7 +76,13 @@
         <h1>The Guide</h1>
         <p class="muted">Where to eat, what to do, and where to go out.</p>
       </header>
-      <div class="filters" id="filters" role="toolbar" aria-label="Filter by section"></div>
+      <div class="guide-controls">
+        <div class="filters" id="filters" role="toolbar" aria-label="Filter by section"></div>
+        <div class="mode-toggle" id="guide-mode" role="group" aria-label="Organize by">
+          <button class="mode-btn is-active" data-mode="type" aria-pressed="true">By type</button>
+          <button class="mode-btn" data-mode="area" aria-pressed="false">By neighborhood</button>
+        </div>
+      </div>
       <div id="place-list"></div>
     </section>
 

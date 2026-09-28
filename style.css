@@ -337,19 +337,74 @@ main {
    Guide: filters, groups, place cards
    --------------------------------------------------------------------------- */
 
-.filters {
+/* Section chips + the type/neighborhood switch stick together as one bar. */
+.guide-controls {
   position: sticky;
   top: 0;
   z-index: 5;
+  margin: 0 -16px;
+  padding: 12px 16px 10px;
+  background: var(--header-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+}
+
+.filters {
   display: flex;
   gap: 8px;
   overflow-x: auto;
   margin: 0 -16px;
-  padding: 14px 16px;
-  background: var(--header-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 2px 16px;
   scrollbar-width: none;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  margin-top: 10px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+}
+
+.mode-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mode-btn.is-active {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.area-link {
+  display: inline-block;
+  margin: 14px 4px 0;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.area-link:hover { text-decoration: underline; }
+
+.place-area {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
 }
 
 .filters::-webkit-scrollbar { display: none; }
@@ -734,7 +789,17 @@ main {
 
   main { max-width: 780px; padding: 0 24px; }
 
-  .filters { top: 60px; margin: 0 -24px; padding: 14px 24px; }
+  .guide-controls {
+    top: 60px;
+    margin: 0 -24px;
+    padding: 12px 24px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .filters { margin: 0; padding: 2px 0; }
+  .mode-toggle { margin-top: 0; flex: none; }
 
   .hero { padding: 72px 20px 40px; }
   .hero h1 { font-size: 64px; }
@@ -769,7 +834,8 @@ main {
   #view-home > .hero,
   #view-home > .home-heading,
   #view-home > .section-lede,
-  #view-home > .section-tiles { grid-column: 1 / -1; }
+  #view-home > .section-tiles,
+  #view-home > .area-link { grid-column: 1 / -1; }
 
   #view-home[hidden] { display: none; }
 

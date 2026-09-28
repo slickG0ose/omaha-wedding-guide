@@ -15,8 +15,11 @@ Everything content-related lives in [`data.js`](data.js):
 - `CATEGORIES` — the three Guide sections (Food & Drink, Things to Do,
   Entertainment) and the groups inside each (Coffee & Breakfast, Dinner,
   Bars & Breweries, Live Music & Shows, ...). Rename, add, or reorder freely.
+- `AREAS` — the neighborhoods for the Guide's "By neighborhood" view
+  (Downtown & Old Market, Midtown & Blackstone, Benson, Council Bluffs, ...).
 - `PLACES` — the recommendation cards. Each needs `id` (unique), `category`
-  and `group` (matching ids in `CATEGORIES`), `name`, `blurb`, and `query`.
+  and `group` (matching ids in `CATEGORIES`), `area` (matching an `AREAS`
+  id), `name`, `blurb`, and `query`.
   Optional:
   - `pick: true` — marks it as **your** recommendation: "Nick's pick" badge,
     sorted to the top of its group.
@@ -56,7 +59,8 @@ lists unfinished wedding details, empty groups, and how many picks you've
 marked per section — it's a report, not a gate.
 
 Links can point at a section directly: `…/omaha-wedding-guide/#guide/eat`,
-`#guide/do`, `#guide/fun`, `#saved`, `#contact`.
+`#guide/do`, `#guide/fun`, `#saved`, `#contact`. Add `/by-area` for the
+neighborhood view: `#guide/all/by-area`, `#guide/eat/by-area`.
 
 These run automatically on every push to `main`, and the site only redeploys
 if they pass.

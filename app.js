@@ -62,14 +62,25 @@ function isUnset(value) {
   return !value || String(value).includes("TODO");
 }
 
-function placeCard(place, isSaved) {
+const AREA_LABEL = new Map((typeof AREAS === "undefined" ? [] : AREAS).map((x) => [x.id, x.label]));
+
+function groupLabel(place) {
+  const cat = CATEGORIES.find((c) => c.id === place.category);
+  return cat?.groups.find((g) => g.id === place.group)?.label || "";
+}
+
+// The card's small context line: in the neighborhood view every card in a
+// section shares an area, so it says what kind of place it is instead.
+function placeCard(place, isSaved, mode = "type") {
   const href = mapsHref(place.query);
+  const context = mode === "area" ? groupLabel(place) : AREA_LABEL.get(place.area);
   const li = document.createElement("li");
   li.className = `place-card${place.pick ? " is-pick" : ""}`;
   li.innerHTML = `
     <div class="place-main">
       ${place.pick ? `<p class="pick-badge">${CONTACT.name}'s pick</p>` : ""}
       <a class="place-name" href="${href}" target="_blank" rel="noopener">${place.name}</a>
+      ${context ? `<p class="place-area">${context}</p>` : ""}
       <p class="place-blurb">${place.blurb}</p>
       ${place.tip ? `<p class="place-tip">${place.tip}</p>` : ""}
       <div class="place-meta">
@@ -84,10 +95,10 @@ function placeCard(place, isSaved) {
   return li;
 }
 
-function placeList(places, saved) {
+function placeList(places, saved, mode) {
   const ul = document.createElement("ul");
   ul.className = "place-list";
-  places.forEach((p) => ul.appendChild(placeCard(p, saved.has(p.id))));
+  places.forEach((p) => ul.appendChild(placeCard(p, saved.has(p.id), mode)));
   return ul;
 }
 
@@ -96,7 +107,8 @@ function byPickFirst(a, b) {
   return Number(Boolean(b.pick)) - Number(Boolean(a.pick));
 }
 
-function renderGuide(filter) {
+function renderGuide(filter, mode = "type") {
+  if (mode === "area") return renderGuideByArea(filter);
   const container = document.getElementById("place-list");
   const saved = getSaved();
   container.innerHTML = "";
@@ -132,6 +144,33 @@ function renderGuide(filter) {
 
       container.appendChild(section);
     });
+}
+
+// Same places, sliced by neighborhood instead of by type — for "we're staying
+// downtown, what's walkable?". The section chips still narrow it, so
+// Food & Drink + By neighborhood answers "where do we eat near Benson?".
+function renderGuideByArea(filter) {
+  const container = document.getElementById("place-list");
+  const saved = getSaved();
+  const catOrder = new Map(CATEGORIES.map((c, i) => [c.id, i]));
+  container.innerHTML = "";
+
+  AREAS.forEach((area) => {
+    const places = PLACES
+      .filter((p) => p.area === area.id && (filter === "all" || p.category === filter))
+      .sort((a, b) => byPickFirst(a, b) || catOrder.get(a.category) - catOrder.get(b.category));
+    if (!places.length) return;
+
+    const section = document.createElement("section");
+    section.className = "group";
+    section.innerHTML = `
+      <h2 class="group-heading">${area.label}</h2>
+      ${area.intro ? `<p class="group-intro">${area.intro}</p>` : ""}
+      <h3 class="subgroup-heading">${places.length} spot${places.length === 1 ? "" : "s"}</h3>
+    `;
+    section.appendChild(placeList(places, saved, "area"));
+    container.appendChild(section);
+  });
 }
 
 function renderSaved() {
@@ -248,8 +287,20 @@ function currentGuideFilter() {
   return document.querySelector(".chip.is-active")?.dataset.filter || "all";
 }
 
+function currentGuideMode() {
+  return document.querySelector(".mode-btn.is-active")?.dataset.mode || "type";
+}
+
+function setActiveMode(mode) {
+  document.querySelectorAll(".mode-btn").forEach((b) => {
+    const on = b.dataset.mode === mode;
+    b.classList.toggle("is-active", on);
+    b.setAttribute("aria-pressed", String(on));
+  });
+}
+
 function refreshVisibleLists() {
-  if (!document.getElementById("view-guide").hidden) renderGuide(currentGuideFilter());
+  if (!document.getElementById("view-guide").hidden) renderGuide(currentGuideFilter(), currentGuideMode());
   if (!document.getElementById("view-saved").hidden) renderSaved();
   else updateSavedCount(getSaved().size);
 }
@@ -270,7 +321,7 @@ function setActiveChip(filter) {
 
 const VIEWS = ["home", "guide", "saved", "contact"];
 
-function showView(name, filter) {
+function showView(name, filter, mode) {
   if (!VIEWS.includes(name)) name = "home";
   document.querySelectorAll(".view").forEach((v) => {
     v.hidden = v.id !== `view-${name}`;
@@ -284,22 +335,33 @@ function showView(name, filter) {
   document.body.dataset.view = name;
   if (name === "guide") {
     if (filter) setActiveChip(filter);
-    renderGuide(currentGuideFilter());
+    if (mode) setActiveMode(mode);
+    renderGuide(currentGuideFilter(), currentGuideMode());
   }
   if (name === "saved") renderSaved();
   window.scrollTo(0, 0);
 }
 
 // The hash is the source of truth for the current view, so the back button
-// works and "#guide/eat" is a link Nick can text to someone.
+// works and "#guide/eat" or "#guide/all/by-area" is a link Nick can text.
 function routeFromHash() {
-  const [view, filter] = location.hash.replace(/^#/, "").split("/");
+  const [view, filter, by] = location.hash.replace(/^#/, "").split("/");
   const validFilter = filter && CATEGORIES.some((c) => c.id === filter) ? filter : null;
-  showView(view || "home", view === "guide" ? validFilter || "all" : null);
+  const isGuide = view === "guide";
+  showView(
+    view || "home",
+    isGuide ? validFilter || "all" : null,
+    isGuide ? (by === "by-area" ? "area" : "type") : null
+  );
 }
 
-function navigate(view, filter) {
-  const hash = view === "home" ? "" : `#${view}${filter && filter !== "all" ? `/${filter}` : ""}`;
+function guideHash(filter = "all", mode = "type") {
+  if (mode === "area") return `#guide/${filter}/by-area`;
+  return filter === "all" ? "#guide" : `#guide/${filter}`;
+}
+
+function navigate(view, filter, mode) {
+  const hash = view === "home" ? "" : view === "guide" ? guideHash(filter, mode) : `#${view}`;
   if (location.hash === hash || (!hash && !location.hash)) {
     routeFromHash();
   } else if (hash) {
@@ -413,7 +475,13 @@ function init() {
   document.getElementById("filters").addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
     if (!chip) return;
-    navigate("guide", chip.dataset.filter);
+    navigate("guide", chip.dataset.filter, currentGuideMode());
+  });
+
+  document.getElementById("guide-mode").addEventListener("click", (e) => {
+    const btn = e.target.closest(".mode-btn");
+    if (!btn) return;
+    navigate("guide", currentGuideFilter(), btn.dataset.mode);
   });
 
   window.addEventListener("hashchange", routeFromHash);

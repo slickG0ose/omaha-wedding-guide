@@ -62,6 +62,24 @@ test("a shared #guide/eat link opens straight to Food & Drink", async ({ page })
   await expect(page.locator(".group-heading")).toHaveCount(1);
 });
 
+test("the guide can be organized by neighborhood, and the section chips still filter it", async ({ page }) => {
+  await page.goto("/#guide");
+  await page.getByRole("button", { name: "By neighborhood" }).click();
+  await expect(page).toHaveURL(/#guide\/all\/by-area$/);
+  await expect(page.locator(".group-heading").first()).toHaveText("Downtown & Old Market");
+
+  const total = await page.locator("#place-list .place-card").count();
+  expect(total).toBe(await page.evaluate(() => PLACES.length));
+
+  await page.locator(".chip", { hasText: "Food & Drink" }).click();
+  await expect(page).toHaveURL(/#guide\/eat\/by-area$/);
+  const food = await page.evaluate(() => PLACES.filter((p) => p.category === "eat").length);
+  await expect(page.locator("#place-list .place-card")).toHaveCount(food);
+
+  await page.getByRole("button", { name: "By type" }).click();
+  await expect(page).toHaveURL(/#guide\/eat$/);
+});
+
 test("home section tiles lead into the guide, and back returns home", async ({ page }) => {
   await page.locator(".section-tile").first().click();
   await expect(page.locator("#view-guide")).toBeVisible();
