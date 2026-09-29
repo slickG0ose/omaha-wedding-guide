@@ -149,6 +149,18 @@ describe("sharing", () => {
     assert.ok(readFileSync(join(root, file)).length > 0, `${file} is missing from the repo`);
   });
 
+  // The deploy job copies an explicit file list. A new asset the page links
+  // to but CI doesn't copy ships as a 404 — this caught share.png once.
+  test("every local file index.html references is in the deploy list", () => {
+    const html = readFileSync(join(root, "index.html"), "utf8");
+    const ci = readFileSync(join(root, ".github/workflows/ci.yml"), "utf8");
+    const deployed = new Set(ci.match(/cp (.+) _site\//)[1].split(/\s+/));
+    const refs = [...html.matchAll(/(?:src|href|content)="([^"]+\.(?:js|css|png|svg|ico|webmanifest))"/g)]
+      .map((m) => m[1].replace("https://slickg0ose.github.io/anna-and-charlie/", ""))
+      .filter((p) => !/^(https?:|data:)/.test(p));
+    for (const ref of refs) assert.ok(deployed.has(ref), `${ref} is referenced by index.html but not copied in ci.yml`);
+  });
+
   test("the countdown date is a valid ISO date", () => {
     assert.match(WEDDING.isoDate, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(!Number.isNaN(new Date(WEDDING.isoDate).getTime()));
