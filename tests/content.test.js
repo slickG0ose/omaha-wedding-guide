@@ -137,6 +137,24 @@ describe("wedding details", () => {
   });
 });
 
+describe("sharing", () => {
+  // Link previews in iMessage/Slack need an absolute og:image URL that
+  // actually ships with the site.
+  test("the link-preview image is referenced absolutely and exists", () => {
+    const html = readFileSync(join(root, "index.html"), "utf8");
+    const m = html.match(/property="og:image" content="([^"]+)"/);
+    assert.ok(m, "index.html has no og:image");
+    assert.match(m[1], /^https:\/\//, "og:image must be an absolute https URL");
+    const file = m[1].split("/").pop();
+    assert.ok(readFileSync(join(root, file)).length > 0, `${file} is missing from the repo`);
+  });
+
+  test("the countdown date is a valid ISO date", () => {
+    assert.match(WEDDING.isoDate, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(!Number.isNaN(new Date(WEDDING.isoDate).getTime()));
+  });
+});
+
 describe("styles", () => {
   // The whole light/dark system depends on colors living in custom properties.
   // A raw hex anywhere else is a color that can't flip with the theme — the

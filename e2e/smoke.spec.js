@@ -117,6 +117,39 @@ test("saving a place persists across a reload", async ({ page }) => {
   await expect(page.locator("#saved-list")).toContainText(savedName);
 });
 
+test("tapping a heart flips it in place without redrawing the list", async ({ page }) => {
+  await page.getByRole("button", { name: "Guide" }).click();
+  const card = page.locator(".place-card").nth(3);
+  await card.evaluate((el) => (el.dataset.marker = "same-node"));
+  await card.locator(".save-btn").click();
+
+  await expect(card.locator(".save-btn")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator('.place-card[data-marker="same-node"]')).toHaveCount(1);
+  await expect(page.locator(".tabbar .saved-count")).toHaveText("1");
+});
+
+test("the header counts down to the wedding", async ({ page }) => {
+  await page.clock.setFixedTime(new Date(2026, 8, 29, 12));
+  await page.reload();
+  await expect(page.locator("#countdown")).toHaveText("4 days to go");
+
+  await page.clock.setFixedTime(new Date(2026, 9, 4, 12));
+  await page.reload();
+  await expect(page.locator("#countdown")).toBeHidden();
+});
+
+test("share copies the home link where there's no share sheet", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.evaluate(() => { delete Navigator.prototype.share; });
+  await page.goto("/#contact");
+  await page.evaluate(() => { delete Navigator.prototype.share; });
+  await page.locator("#share-btn").click();
+  await expect(page.locator("#share-label")).toHaveText("Link copied");
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toMatch(/\/$/);
+  expect(copied).not.toContain("#");
+});
+
 test("unsaving empties the list again", async ({ page }) => {
   await page.getByRole("button", { name: "Guide" }).click();
   await page.locator(".place-card").first().locator(".save-btn").click();

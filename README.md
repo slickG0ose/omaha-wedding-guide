@@ -40,6 +40,16 @@ instead of a web page.
 
 No build step. Editing `data.js` and refreshing the page is the whole loop.
 
+## Link preview image
+
+`share.png` is what iMessage, Slack, etc. show when the link is pasted.
+If the names, date, or colors change, regenerate it (and the home-screen
+icon) with:
+
+```bash
+node scripts/make-share-images.mjs
+```
+
 ## Running locally
 
 ```bash

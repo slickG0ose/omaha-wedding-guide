@@ -20,6 +20,7 @@ style.css|Mobile-first styles; every color is a custom property on :root|{--bg,-
 tests/content.test.js|node:test suite over data.js + style.css — runs in ~30ms, no browser|
 e2e/smoke.spec.js|Playwright specs — tabs, filters, save persistence, maps links, phone-width overflow|
 scripts/launch-readiness.mjs|Advisory TODO report over guest-facing content|
+scripts/make-share-images.mjs|Regenerates share.png (link preview) + apple-touch-icon.png via Playwright. Re-run if couple/date/palette changes|
 functions/triplist/index.mjs|Neon Function: the ONLY backend. Trip-code sync, strict input validation, CORS allowlist|
 .github/workflows/ci.yml|Test job gates the Pages deploy job|
 
@@ -36,6 +37,8 @@ content|data.js — WEDDING (venue/times), CONTACT (email), CATEGORIES (sections
 categories|data.js CATEGORIES — eat, do, fun; each has groups[]. Empty groups are hidden on the page
 routing|app.js routeFromHash / navigate / guideHash — #guide/<category>[/by-area], #saved, #contact; back button works
 neighborhoods|data.js AREAS + place.area; app.js renderGuideByArea — the By neighborhood view
+sharing|index.html og:* tags → share.png (absolute URL); app.js shareGuide (native share sheet, clipboard fallback)
+motion|style.css `rise` keyframes; app.js staggerIn. Hearts toggle in place — never re-render a list on save or the entrance replays
 unfinished|app.js isUnset — any TODO/empty WEDDING/REHEARSAL field is hidden from guests, never printed
 maps-links|app.js mapsHref() — maps.apple.com on iPhone/iPad/Mac, maps.google.com elsewhere
 favorites|app.js SAVED_KEY / getSaved / setSaved / toggleSaved — localStorage, local-first

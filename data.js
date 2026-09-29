@@ -21,6 +21,7 @@
 const WEDDING = {
   couple: "Anna & Charlie",
   date: "Saturday, October 3, 2026",
+  isoDate: "2026-10-03", // drives the "N days to go" countdown in the header
   venueName: "Russ & Jean's",
   venueAddress: "2006 Jennings Ave, Council Bluffs, IA 51503",
   venueQuery: "2006 Jennings Ave Council Bluffs IA 51503",
@@ -197,6 +198,7 @@ const PLACES = [
     name: "Block 16",
     blurb: "Downtown counter-service sandwiches with a cult following. Expect a line at lunch.",
     tag: "Sandwiches",
+    pick: true,
     query: "Block 16 Omaha"
   },
 
@@ -245,7 +247,7 @@ const PLACES = [
     name: "Clio",
     blurb: "Flagship's Mediterranean spot at 12th & Howard — mezze, spreads, and big shareable plates, with a serious European wine list. Plenty for vegetarians. Book ahead.",
     tag: "Mediterranean",
-    pick: true,
+    pick: false,
     query: "Clio 1202 Howard St Omaha"
   },
   {
@@ -256,7 +258,7 @@ const PLACES = [
     name: "Anthem",
     blurb: "Across the street from Clio in the Old Market. Fun, high-energy room doing Tex-Asian comfort food — smash burgers, wonton tuna tacos, noodles — plus weekend brunch and a patio.",
     tag: "Tex-Asian",
-    pick: true,
+    pick: false,
     query: "Anthem 1205 Howard St Omaha"
   },
 
@@ -356,7 +358,7 @@ const PLACES = [
     name: "El Basha",
     blurb: "Family-run Lebanese grill on Pacific St — hummus, falafel, shawarma, and some of the best gyros in town. Hungry? Get the mixed grill. Closed Sundays.",
     tag: "Lebanese",
-    pick: true,
+    pick: false,
     query: "El Basha 7503 Pacific St Omaha"
   },
 
@@ -391,7 +393,7 @@ const PLACES = [
     name: "SET the Bar",
     blurb: "Nebraska's first women's sports bar, at 62nd & Maple — a wall of screens with the games on audio. Everyone's welcome; the women's games just get the big screen.",
     tag: "Sports bar",
-    pick: true,
+    pick: false,
     query: "SET the Bar Benson Omaha"
   },
   {
@@ -413,7 +415,7 @@ const PLACES = [
     name: "Brokedown Palace",
     blurb: "Shakedown's sister bar out west at 88th & Maple — Deadheads, Husker games, live bands on the patio, and a dog-friendly crowd.",
     tag: "Live music",
-    pick: true,
+    pick: false,
     query: "Brokedown Palace 8805 Maple St Omaha"
   },
 

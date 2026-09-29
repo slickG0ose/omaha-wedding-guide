@@ -8,6 +8,13 @@
   <meta property="og:title" content="Anna & Charlie's Wedding — Omaha Guide" />
   <meta property="og:description" content="Wedding-weekend details plus where to eat, what to do, and where to go out around Omaha." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://slickg0ose.github.io/anna-and-charlie/" />
+  <meta property="og:image" content="https://slickg0ose.github.io/anna-and-charlie/share.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Anna & Charlie — Omaha wedding guide, October 3, 2026" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <meta name="theme-color" content="#f7f2ea" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#17130f" media="(prefers-color-scheme: dark)" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23a8452f'/><text x='16' y='22' font-family='Georgia,serif' font-size='16' text-anchor='middle' fill='white'>A&amp;C</text></svg>" />
@@ -32,6 +39,7 @@
         <p class="eyebrow">Welcome to Omaha</p>
         <h1 id="hero-title">Anna &amp; Charlie</h1>
         <p class="hero-date" id="hero-date"></p>
+        <p class="countdown" id="countdown" hidden></p>
       </header>
 
       <div class="card card-feature">
@@ -140,13 +148,27 @@
     <section id="view-contact" class="view" hidden>
       <header class="view-header">
         <h1>Questions?</h1>
+        <p id="contact-blurb" class="muted"></p>
       </header>
       <div class="card">
+        <p class="card-eyebrow">Get in touch</p>
         <h2 id="contact-heading"></h2>
-        <p id="contact-blurb" class="muted"></p>
+        <p id="contact-address" class="muted"></p>
         <div class="btn-row">
           <a id="contact-email" class="btn" href="#">Email me</a>
           <a id="contact-phone" class="btn btn-secondary" href="#" hidden>Text me</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-eyebrow">Pass it along</p>
+        <h2>Share this guide</h2>
+        <p class="muted">Send it to anyone else coming in for the weekend.</p>
+        <div class="btn-row">
+          <button id="share-btn" class="btn btn-secondary" type="button">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+            <span id="share-label">Share link</span>
+          </button>
         </div>
       </div>
     </section>

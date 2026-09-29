@@ -144,6 +144,7 @@ function renderGuide(filter, mode = "type") {
 
       container.appendChild(section);
     });
+  staggerIn(container);
 }
 
 // Same places, sliced by neighborhood instead of by type — for "we're staying
@@ -171,6 +172,19 @@ function renderGuideByArea(filter) {
     section.appendChild(placeList(places, saved, "area"));
     container.appendChild(section);
   });
+  staggerIn(container);
+}
+
+// Cards fade up in sequence when a list is drawn. Capped so a long list
+// doesn't make the last card wait — everything past the first screenful
+// arrives together.
+function staggerIn(container) {
+  container.classList.remove("is-entering");
+  container.querySelectorAll(".place-card").forEach((card, i) => {
+    card.style.setProperty("--i", Math.min(i, 8));
+  });
+  void container.offsetWidth; // restart the animation on re-render
+  container.classList.add("is-entering");
 }
 
 function renderSaved() {
@@ -344,7 +358,13 @@ function showView(name, filter, mode) {
 
 // The hash is the source of truth for the current view, so the back button
 // works and "#guide/eat" or "#guide/all/by-area" is a link Nick can text.
-function routeFromHash() {
+// Setting location.hash fires both hashchange and popstate; without this
+// guard every tap rendered twice (and replayed the card entrance twice).
+let lastRoute = null;
+
+function routeFromHash(force = false) {
+  if (!force && location.hash === lastRoute) return;
+  lastRoute = location.hash;
   const [view, filter, by] = location.hash.replace(/^#/, "").split("/");
   const validFilter = filter && CATEGORIES.some((c) => c.id === filter) ? filter : null;
   const isGuide = view === "guide";
@@ -363,12 +383,12 @@ function guideHash(filter = "all", mode = "type") {
 function navigate(view, filter, mode) {
   const hash = view === "home" ? "" : view === "guide" ? guideHash(filter, mode) : `#${view}`;
   if (location.hash === hash || (!hash && !location.hash)) {
-    routeFromHash();
+    routeFromHash(true);
   } else if (hash) {
     location.hash = hash;
   } else {
     history.pushState(null, "", location.pathname + location.search);
-    routeFromHash();
+    routeFromHash(true);
   }
 }
 
@@ -397,6 +417,18 @@ function setDetail(rowId, ddId, value, pending) {
   } else {
     document.getElementById(rowId).remove();
   }
+}
+
+function initCountdown() {
+  const el = document.getElementById("countdown");
+  if (!WEDDING.isoDate) return;
+  const [y, m, d] = WEDDING.isoDate.split("-").map(Number);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.round((new Date(y, m - 1, d) - today) / 86400000);
+  if (days < 0) return; // after the wedding the header just shows the date
+  el.textContent = days === 0 ? "Today's the day" : days === 1 ? "Tomorrow!" : `${days} days to go`;
+  el.hidden = false;
 }
 
 function initWeddingCard() {
@@ -446,11 +478,38 @@ function initRehearsalCard() {
   card.hidden = false;
 }
 
+// Native share sheet on phones; copy-to-clipboard everywhere else. Always
+// shares the home URL, not whatever view the sharer happens to be on.
+async function shareGuide() {
+  const url = location.origin + location.pathname;
+  const label = document.getElementById("share-label");
+  const flash = (text) => {
+    label.textContent = text;
+    setTimeout(() => (label.textContent = "Share link"), 2200);
+  };
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: document.title, text: `${WEDDING.couple} — Omaha weekend guide`, url });
+    } catch {
+      // Dismissed the share sheet — nothing to do.
+    }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    flash("Link copied");
+  } catch {
+    flash(url);
+  }
+}
+
 function init() {
   initWeddingCard();
   initRehearsalCard();
+  initCountdown();
 
   document.getElementById("contact-heading").textContent = `Ask ${CONTACT.name}`;
+  document.getElementById("contact-address").textContent = CONTACT.email;
   document.getElementById("contact-blurb").textContent = CONTACT.blurb;
   const emailLink = document.getElementById("contact-email");
   emailLink.href = `mailto:${CONTACT.email}`;
@@ -484,16 +543,28 @@ function init() {
     navigate("guide", currentGuideFilter(), btn.dataset.mode);
   });
 
-  window.addEventListener("hashchange", routeFromHash);
-  window.addEventListener("popstate", routeFromHash);
+  window.addEventListener("hashchange", () => routeFromHash());
+  window.addEventListener("popstate", () => routeFromHash());
 
   document.getElementById("views").addEventListener("click", (e) => {
     const btn = e.target.closest(".save-btn");
     if (!btn) return;
     toggleSaved(btn.dataset.id);
-    refreshVisibleLists();
+    // Flip the heart in place rather than redrawing the list — a redraw would
+    // replay the entrance animation and jump the scroll position on every tap.
+    const isSaved = getSaved().has(btn.dataset.id);
+    const name = btn.closest(".place-card")?.querySelector(".place-name")?.textContent || "";
+    document.querySelectorAll(`.save-btn[data-id="${btn.dataset.id}"]`).forEach((b) => {
+      b.classList.toggle("is-saved", isSaved);
+      b.setAttribute("aria-pressed", String(isSaved));
+      b.setAttribute("aria-label", `${isSaved ? "Remove" : "Save"} ${name}`);
+    });
+    if (!document.getElementById("view-saved").hidden) renderSaved();
+    else updateSavedCount(getSaved().size);
     pushSync();
   });
+
+  document.getElementById("share-btn").addEventListener("click", shareGuide);
 
   document.getElementById("sync-create").addEventListener("click", createTripCode);
 
