@@ -40,6 +40,7 @@ const WEDDING = {
 const REHEARSAL = {
   title: "Rehearsal Dinner",
   date: "Friday, October 2, 2026",
+  time: "6:00–9:00 PM",
   venueName: "Upstream Brewing Company",
   venueArea: "Old Market, downtown Omaha",
   venueQuery: "Upstream Brewing Company Old Market Omaha",
